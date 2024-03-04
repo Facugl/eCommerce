@@ -1,7 +1,7 @@
 package com.facugl.ecommerce.server.application.port.input.categories;
 
-import com.facugl.ecommerce.server.domain.model.Category;
+import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
 
 public interface ActiveCategoryUseCase {
-    Category activeCategory(Long id, Category category);
+    void activeCategory(Long id, CategoryStatus status);
 }

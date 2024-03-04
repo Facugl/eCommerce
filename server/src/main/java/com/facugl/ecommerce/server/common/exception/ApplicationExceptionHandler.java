@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.facugl.ecommerce.server.common.exception.generic.CategoryNameNotUniqueException;
+import com.facugl.ecommerce.server.common.exception.generic.EntityNameNotUniqueException;
 import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundException;
 import com.facugl.ecommerce.server.common.exception.generic.SelfParentCategoryException;
 
@@ -44,12 +44,12 @@ public class ApplicationExceptionHandler {
     }
 
 
-    @ExceptionHandler({CategoryNameNotUniqueException.class, SelfParentCategoryException.class})
-    public ResponseEntity<ErrorMessage> handleCategoryNameNotUniqueException(CategoryNameNotUniqueException ex) {
+    @ExceptionHandler({EntityNameNotUniqueException.class, SelfParentCategoryException.class})
+    public ResponseEntity<ErrorMessage> handleCategoryNameNotUniqueException(EntityNameNotUniqueException ex) {
         ErrorMessage errorMessage = new ErrorMessage();
 
         errorMessage.setDate(LocalDateTime.now());
-        errorMessage.setMessage("Error creating category: " + ex.getMessage());
+        errorMessage.setMessage("Error creating entity: " + ex.getMessage());
         errorMessage.setStatus(HttpStatus.BAD_REQUEST);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);

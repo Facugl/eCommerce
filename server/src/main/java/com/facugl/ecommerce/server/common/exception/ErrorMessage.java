@@ -10,7 +10,9 @@ import lombok.Data;
 public class ErrorMessage {
 
     private LocalDateTime date;
+
     private String message;
+
     private HttpStatus status;
-    
+
 }

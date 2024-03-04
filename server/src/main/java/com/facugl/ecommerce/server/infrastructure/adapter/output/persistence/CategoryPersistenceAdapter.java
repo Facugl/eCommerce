@@ -7,9 +7,10 @@ import java.util.stream.Collectors;
 import com.facugl.ecommerce.server.application.port.output.CategoryOutputPort;
 import com.facugl.ecommerce.server.common.PersistenceAdapter;
 import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundException;
-import com.facugl.ecommerce.server.domain.model.Category;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.CategoryEntity;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceMapper;
+import com.facugl.ecommerce.server.domain.model.categories.Category;
+import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
+import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.categories.CategoryEntity;
+import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceCategoryMapper;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.CategoryRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class CategoryPersistenceAdapter implements CategoryOutputPort {
 
     private final CategoryRepository categoryRepository;
-    private final PersistenceMapper categoryMapper;
+    private final PersistenceCategoryMapper categoryMapper;
 
     @Override
     public boolean isCategoryNameUnique(String name) {
@@ -31,14 +32,17 @@ public class CategoryPersistenceAdapter implements CategoryOutputPort {
         CategoryEntity categoryEntity = categoryMapper.mapToCategoryEntity(category, categoryRepository);
 
         if (categoryEntity.getParentCategory() != null && categoryEntity.getParentCategory().getId() == null) {
-            // Si la parentCategory aún no ha sido persistida, se intenta persistirla
-            Category parentCategory = categoryMapper.mapToCategory(categoryEntity.getParentCategory());
-            CategoryEntity parentCategoryEntity = categoryMapper.mapToCategoryEntity(parentCategory,
-                    categoryRepository);
-            categoryEntity.setParentCategory(categoryRepository.save(parentCategoryEntity));
+            categoryEntity.setParentCategory(categoryRepository.save(categoryEntity.getParentCategory()));
         }
 
-        categoryEntity.setStatus(true);
+        if (categoryEntity.getParentCategory() != null && categoryEntity.getParentCategory().getId() != null) {
+            Optional<CategoryEntity> CategoryOptional = categoryRepository
+                    .findById(categoryEntity.getParentCategory().getId());
+            categoryEntity.setParentCategory(CategoryOptional.get());
+        }
+
+        categoryEntity.setStatus(CategoryStatus.ENABLED);
+
         CategoryEntity savedCategoryEntity = categoryRepository.save(categoryEntity);
 
         return categoryMapper.mapToCategory(savedCategoryEntity);
@@ -47,13 +51,13 @@ public class CategoryPersistenceAdapter implements CategoryOutputPort {
     @Override
     public Optional<Category> findCategoryByName(String name) {
         return categoryRepository.findByName(name)
-                .map(categoryMapper::mapToCategory);
+                .map(categoryEntity -> categoryMapper.mapToCategory(categoryEntity));
     }
 
     @Override
     public Optional<Category> findCategoryById(Long id) {
         return categoryRepository.findById(id)
-                .map(categoryMapper::mapToCategory);
+                .map(categoryMapper::mapToCategory); // Notación más compacta
     }
 
     @Override
@@ -101,25 +105,24 @@ public class CategoryPersistenceAdapter implements CategoryOutputPort {
 
     @Override
     public Category updateCategory(Long id, Category category) {
-        Optional<Category> categoryOptional = categoryRepository.findById(id)
-                .map(categoryMapper::mapToCategory);
+        CategoryEntity categoryEntity = categoryRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Category with id: " + id + " not found."));
 
-        CategoryEntity categoryEntity = categoryMapper.mapToCategoryEntity(categoryOptional.get(), categoryRepository);
-
-        if (categoryOptional.isPresent()) {
+        if (category.getName() != null) {
             categoryEntity.setName(category.getName());
+        }
 
-            // Verifica si la parentCategory existe
-            if (category.getParentCategory() != null && category.getParentCategory().getId() == null) {
-                // Si la parentCategory aún no ha sido persistida, se intenta persistirla
-                CategoryEntity parentCategoryEntity = categoryMapper.mapToCategoryEntity(category.getParentCategory(),
-                        categoryRepository);
-                categoryEntity.setParentCategory(categoryRepository.save(parentCategoryEntity));
-            }
+        // Verifica si la parentCategory existe
+        if (category.getParentCategory() != null && category.getParentCategory().getId() == null) {
+            // Si la parentCategory aún no ha sido persistida, se intenta persistirla
+            CategoryEntity parentCategoryEntity = categoryMapper.mapToCategoryEntity(category.getParentCategory(),
+                    categoryRepository);
+            categoryEntity.setParentCategory(categoryRepository.save(parentCategoryEntity));
+        }
 
-            if (category.getParentCategory() != null ) {
-                categoryEntity.setParentCategory(categoryMapper.mapToCategoryEntity(category.getParentCategory(), categoryRepository));
-            }
+        if (category.getParentCategory() != null) {
+            categoryEntity.setParentCategory(
+                    categoryMapper.mapToCategoryEntity(category.getParentCategory(), categoryRepository));
         }
 
         CategoryEntity savedCategoryEntity = categoryRepository.save(categoryEntity);
@@ -128,13 +131,16 @@ public class CategoryPersistenceAdapter implements CategoryOutputPort {
     }
 
     @Override
-    public Category activeCategogry(Long id, Category category) {
+    public void activeCategory(Long id, CategoryStatus status) {
         Optional<CategoryEntity> categoryEntityOptional = categoryRepository.findById(id);
 
-        CategoryEntity categoryEntity = categoryEntityOptional.get();
-        categoryEntity.setStatus(category.isStatus());
+        if (categoryEntityOptional.isPresent()) {
+            CategoryEntity categoryEntity = categoryEntityOptional.get();
 
-        return categoryMapper.mapToCategory(categoryRepository.save(categoryEntity));
+            categoryEntity.setStatus(status);
+
+            categoryRepository.save(categoryEntity);
+        }
     }
 
 }
