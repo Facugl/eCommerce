@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.facugl.ecommerce.server.application.mapper.ApplicationCategoryMapper;
+import com.facugl.ecommerce.server.application.mapper.ApplicationProductMapper;
 import com.facugl.ecommerce.server.application.port.input.categories.ActiveCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.CreateCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllCategoriesUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllMainCategoriesUseCase;
+import com.facugl.ecommerce.server.application.port.input.categories.GetAllProductsByCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllSubCategoriesUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.UpdateCategoryUseCase;
@@ -26,8 +28,10 @@ import com.facugl.ecommerce.server.application.port.output.CategoryOutputPort;
 import com.facugl.ecommerce.server.common.WebAdapter;
 import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
+import com.facugl.ecommerce.server.domain.model.products.Product;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request.CategoryRequest;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.CategoryResponse;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.ProductResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +43,7 @@ import lombok.RequiredArgsConstructor;
 public class CategoryRestAdapter {
 
         private final ApplicationCategoryMapper categoryMapper;
+        private final ApplicationProductMapper productMapper;
 
         private final CreateCategoryUseCase createCategoryUseCase;
         private final GetCategoryUseCase getCategoryUseCase;
@@ -47,6 +52,7 @@ public class CategoryRestAdapter {
         private final GetAllSubCategoriesUseCase getAllSubCategoriesUseCase;
         private final UpdateCategoryUseCase updateCategoryUseCase;
         private final ActiveCategoryUseCase activeCategoryUseCase;
+        private final GetAllProductsByCategoryUseCase getAllProductsByCategoryUseCase;
 
         private final CategoryOutputPort categoryOutputPort;
 
@@ -126,6 +132,19 @@ public class CategoryRestAdapter {
                 return ResponseEntity
                                 .status(HttpStatus.OK)
                                 .build();
+        }
+
+        @GetMapping("/{id}/products")
+        public ResponseEntity<List<ProductResponse>> getAllProducts(@PathVariable Long id) {
+                List<Product> productList = getAllProductsByCategoryUseCase.getAllProducts(id);
+
+                List<ProductResponse> productResponseList = productList.stream()
+                                .map(productMapper::mapToProductResponse)
+                                .collect(Collectors.toList());
+
+                return ResponseEntity
+                                .status(HttpStatus.OK)
+                                .body(productResponseList);
         }
 
 }

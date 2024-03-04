@@ -8,6 +8,7 @@ import com.facugl.ecommerce.server.application.port.input.categories.ActiveCateg
 import com.facugl.ecommerce.server.application.port.input.categories.CreateCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllCategoriesUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllMainCategoriesUseCase;
+import com.facugl.ecommerce.server.application.port.input.categories.GetAllProductsByCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllSubCategoriesUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.UpdateCategoryUseCase;
@@ -17,6 +18,7 @@ import com.facugl.ecommerce.server.common.exception.generic.EntityNameNotUniqueE
 import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundException;
 import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
+import com.facugl.ecommerce.server.domain.model.products.Product;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +31,8 @@ public class CategoryService implements
         GetAllMainCategoriesUseCase,
         GetAllSubCategoriesUseCase,
         UpdateCategoryUseCase,
-        ActiveCategoryUseCase {
+        ActiveCategoryUseCase,
+        GetAllProductsByCategoryUseCase {
 
     private final CategoryOutputPort categoryOutputPort;
 
@@ -87,6 +90,15 @@ public class CategoryService implements
         if (status == CategoryStatus.ENABLED || status == CategoryStatus.DISABLED) {
             categoryOutputPort.activeCategory(id, status);
         }
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<Product> getAllProducts(Long categoryId) {
+        categoryOutputPort.findCategoryById(categoryId)
+                .orElseThrow(() -> new EntityNotFoundException("Category with id: " + categoryId + " not found."));
+
+        return categoryOutputPort.getAllProductsByCategory(categoryId);
     }
 
 }

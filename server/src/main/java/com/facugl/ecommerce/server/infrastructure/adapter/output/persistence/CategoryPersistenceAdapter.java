@@ -9,8 +9,11 @@ import com.facugl.ecommerce.server.common.PersistenceAdapter;
 import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundException;
 import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
+import com.facugl.ecommerce.server.domain.model.products.Product;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.categories.CategoryEntity;
+import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.products.ProductEntity;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceCategoryMapper;
+import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceProductMapper;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.CategoryRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,7 +23,9 @@ import lombok.RequiredArgsConstructor;
 public class CategoryPersistenceAdapter implements CategoryOutputPort {
 
     private final CategoryRepository categoryRepository;
+
     private final PersistenceCategoryMapper categoryMapper;
+    private final PersistenceProductMapper productMapper;
 
     @Override
     public boolean isCategoryNameUnique(String name) {
@@ -141,6 +146,18 @@ public class CategoryPersistenceAdapter implements CategoryOutputPort {
 
             categoryRepository.save(categoryEntity);
         }
+    }
+
+    @Override
+    public List<Product> getAllProductsByCategory(Long categoryId) {
+        Optional<CategoryEntity> categoryEntityOptional = categoryRepository.findById(categoryId);
+
+        List<ProductEntity> productEntityList = categoryEntityOptional.get().getProducts();
+
+        List<Product> productList = productEntityList.stream()
+                .map(product -> productMapper.mapToProduct(product, categoryMapper)).collect(Collectors.toList());
+
+        return productList;
     }
 
 }
