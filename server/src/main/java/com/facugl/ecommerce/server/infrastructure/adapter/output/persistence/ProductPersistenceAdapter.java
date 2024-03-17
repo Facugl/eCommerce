@@ -89,7 +89,7 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
 
         if (productToUpdate.getCategory() != null) {
             productEntity
-                    .setCategory(categoryMapper.mapToCategoryEntity(productToUpdate.getCategory(), categoryRepository));
+                    .setCategory(categoryMapper.mapToCategoryEntity(productToUpdate.getCategory()));
         }
 
         ProductEntity savedProductEntity = productRepository.save(productEntity);

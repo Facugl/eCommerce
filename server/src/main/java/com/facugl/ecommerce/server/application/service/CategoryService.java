@@ -15,7 +15,6 @@ import com.facugl.ecommerce.server.application.port.input.categories.UpdateCateg
 import com.facugl.ecommerce.server.application.port.output.CategoryOutputPort;
 import com.facugl.ecommerce.server.common.UseCase;
 import com.facugl.ecommerce.server.common.exception.generic.EntityNameNotUniqueException;
-import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundException;
 import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
 import com.facugl.ecommerce.server.domain.model.products.Product;
@@ -49,8 +48,7 @@ public class CategoryService implements
     @Transactional(readOnly = true)
     @Override
     public Category getCategoryById(Long id) {
-        return categoryOutputPort.findCategoryById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Category with id: " + id + " not found."));
+        return categoryOutputPort.findCategoryById(id);
     }
 
     @Transactional(readOnly = true)
@@ -84,9 +82,6 @@ public class CategoryService implements
     @Transactional
     @Override
     public void activeCategory(Long id, CategoryStatus status) {
-        categoryOutputPort.findCategoryById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Category with id: " + id + " not found."));
-
         if (status == CategoryStatus.ENABLED || status == CategoryStatus.DISABLED) {
             categoryOutputPort.activeCategory(id, status);
         }
@@ -95,9 +90,6 @@ public class CategoryService implements
     @Transactional(readOnly = true)
     @Override
     public List<Product> getAllProducts(Long categoryId) {
-        categoryOutputPort.findCategoryById(categoryId)
-                .orElseThrow(() -> new EntityNotFoundException("Category with id: " + categoryId + " not found."));
-
         return categoryOutputPort.getAllProductsByCategory(categoryId);
     }
 

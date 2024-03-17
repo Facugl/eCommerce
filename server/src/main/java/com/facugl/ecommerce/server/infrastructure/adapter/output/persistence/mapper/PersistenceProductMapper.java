@@ -20,7 +20,7 @@ public interface PersistenceProductMapper {
                 .description(product.getDescription())
                 .image(product.getImage())
                 .status(product.getStatus())
-                .category(categoryMapper.mapToCategoryEntity(product.getCategory(), categoryRepository))
+                .category(categoryMapper.mapToCategoryEntity(product.getCategory()))
                 .build();
     }
 
