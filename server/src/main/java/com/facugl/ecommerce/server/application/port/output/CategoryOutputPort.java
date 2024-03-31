@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
-import com.facugl.ecommerce.server.domain.model.products.Product;
 
 public interface CategoryOutputPort {
 
@@ -26,7 +25,5 @@ public interface CategoryOutputPort {
     Category updateCategory(Long id, Category category);
 
     void activeCategory(Long id, CategoryStatus status);
-
-    List<Product> getAllProductsByCategory(Long categoryId);
 
 }

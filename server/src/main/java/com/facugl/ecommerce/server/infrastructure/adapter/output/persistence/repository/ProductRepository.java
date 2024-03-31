@@ -1,6 +1,6 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,9 +10,11 @@ import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.ent
 
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 
-    @Query("SELECT COUNT(p) = 0 FROM ProductEntity p WHERE LOWER(p.name) = LOWER(:name)")
-    boolean isCategoryNameUnique(@Param("name") String name);
+    @Query("SELECT p FROM ProductEntity p WHERE p.category.id = :categoryId")
+    List<ProductEntity> findByCategoryId(@Param("categoryId") Long categoryId);
 
-    Optional<ProductEntity> findByName(String name);
+    @Query("SELECT p FROM ProductEntity p WHERE p.category.name = :categoryName AND p.name = :name")
+    List<ProductEntity> findByCategoryNameAndName(@Param("categoryName") String categoryName,
+            @Param("name") String name);
 
 }

@@ -1,70 +1,30 @@
 package com.facugl.ecommerce.server.application.mapper;
 
-import java.util.Optional;
-
 import org.mapstruct.Mapper;
 
-import com.facugl.ecommerce.server.application.port.output.CategoryOutputPort;
+import com.facugl.ecommerce.server.application.service.CategoryService;
 import com.facugl.ecommerce.server.domain.model.categories.Category;
-import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
+import com.facugl.ecommerce.server.domain.model.categories.Category.CategoryBuilder;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request.CategoryRequest;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.CategoryResponse;
 
-@Mapper(componentModel = "spring", uses = CategoryOutputPort.class)
+@Mapper(componentModel = "spring")
 public interface ApplicationCategoryMapper {
 
-    default Category mapToCategory(CategoryRequest request, CategoryOutputPort categoryOutputPort) {
+	default Category mapCategoryRequestToCategory(CategoryRequest request, CategoryService categoryService) {
+		CategoryBuilder categoryBuilder = Category.builder()
+				.name(request.getName())
+				.status(request.getStatus());
 
-        if (request.getParentCategory() != null) {
-            Optional<Category> categoryOptional = categoryOutputPort.findCategoryByName(request.getParentCategory());
+		if (request.getParentCategory() != null) {
+			Category parentCategory = categoryService.getCategoryByName(request.getParentCategory()).orElse(null);
 
-            if (categoryOptional.isEmpty()) {
-                Category newParentCategory = categoryOutputPort.createCategory(
-                        Category.builder()
-                                .name(request.getParentCategory())
-                                .status(CategoryStatus.ENABLED)
-                                .parentCategory(null)
-                                .build());
+			categoryBuilder.parentCategory(parentCategory);
+		}
 
-                return Category.builder()
-                        .name(request.getName())
-                        .status(request.getStatus())
-                        .parentCategory(newParentCategory)
-                        .build();
-            }
+		return categoryBuilder.build();
+	}
 
-            return Category.builder()
-                    .name(request.getName())
-                    .status(request.getStatus())
-                    .parentCategory(categoryOptional.get())
-                    .build();
-
-        }
-
-        return Category.builder()
-                .name(request.getName())
-                .status(request.getStatus())
-                .parentCategory(null)
-                .build();
-
-    }
-
-    default CategoryResponse mapToCategoryResponse(Category category) {
-        if (category.getParentCategory() == null) {
-            return CategoryResponse.builder()
-                    .id(category.getId())
-                    .name(category.getName())
-                    .status(category.getStatus())
-                    .parentCategory(null)
-                    .build();
-        }
-
-        return CategoryResponse.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .status(category.getStatus())
-                .parentCategory(category.getParentCategory())
-                .build();
-    }
+	CategoryResponse mapCategoryToCategoryResponse(Category category);
 
 }

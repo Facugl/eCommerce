@@ -1,6 +1,7 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.categories.CategoryEntity;
@@ -8,19 +9,9 @@ import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.ent
 @Mapper(componentModel = "spring")
 public interface PersistenceCategoryMapper {
 
-    default CategoryEntity mapToCategoryEntity(Category category) {
-        CategoryEntity.CategoryEntityBuilder categoryEntity = CategoryEntity.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .status(category.getStatus());
+    @Mapping(target = "id", ignore = true)
+    CategoryEntity mapCategoryToCategoryEntity(Category category);
 
-        if (category.getParentCategory() != null && category.getParentCategory().getId() != null) {
-            categoryEntity.parentCategory(mapToCategoryEntity(category.getParentCategory()));
-        }
+    Category mapCategoryEntityToCategory(CategoryEntity entity);
 
-        return categoryEntity.build();
-    }
-
-    Category mapToCategory(CategoryEntity entity);
-    
 }

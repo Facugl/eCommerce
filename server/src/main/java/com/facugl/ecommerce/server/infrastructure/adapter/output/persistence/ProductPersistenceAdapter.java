@@ -1,16 +1,16 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.output.persistence;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.facugl.ecommerce.server.application.port.output.ProductOutputPort;
 import com.facugl.ecommerce.server.common.PersistenceAdapter;
+import com.facugl.ecommerce.server.common.exception.generic.EntityNameNotUniqueException;
 import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundException;
 import com.facugl.ecommerce.server.domain.model.products.Product;
 import com.facugl.ecommerce.server.domain.model.products.ProductStatus;
+import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.categories.CategoryEntity;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.products.ProductEntity;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceCategoryMapper;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceProductMapper;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.CategoryRepository;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.ProductRepository;
@@ -25,54 +25,77 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
     private final CategoryRepository categoryRepository;
 
     private final PersistenceProductMapper productMapper;
-    private final PersistenceCategoryMapper categoryMapper;
 
     @Override
-    public boolean isProductNameUnique(String name) {
-        return !productRepository.findByName(name).isPresent();
+    public Product createProduct(Product productToCreate) {
+        String productName = productToCreate.getName();
+        String categoryName = productToCreate.getCategory().getName();
+
+        CategoryEntity categoryEntity = categoryRepository.findByName(categoryName)
+                .orElseThrow(() -> new EntityNotFoundException("Category with name: " + categoryName + " not found."));
+
+        List<ProductEntity> productEntityList = productRepository.findByCategoryNameAndName(categoryName, productName);
+
+        if (productEntityList.isEmpty()) {
+            ProductEntity productEntity = productMapper.mapProductToProductEntity(productToCreate);
+
+            productEntity.setCategory(categoryEntity);
+            productEntity.setStatus(ProductStatus.ENABLED);
+
+            ProductEntity createdProduct = productRepository.save(productEntity);
+
+            return productMapper.mapProductEntityToProduct(createdProduct);
+        } else {
+            throw new EntityNameNotUniqueException(
+                    "Product with name: " + productToCreate.getName() + " already exist.");
+        }
     }
 
     @Override
-    public Product createProduct(Product product) {
-        ProductEntity productEntity = productMapper.mapToProductEntity(product, categoryMapper, categoryRepository);
-
-        productEntity.setStatus(ProductStatus.ENABLED);
-
-        ProductEntity createdProduct = productRepository.save(productEntity);
-
-        return productMapper.mapToProduct(createdProduct, categoryMapper);
-    }
-
-    @Override
-    public Optional<Product> findProductById(Long id) {
-        return productRepository.findById(id)
-                .map(product -> productMapper.mapToProduct(product, categoryMapper));
+    public Product findProductById(Long id) {
+        return productRepository
+                .findById(id)
+                .map(productEntity -> productMapper.mapProductEntityToProduct(productEntity))
+                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
     }
 
     @Override
     public List<Product> getAllProducts() {
-        List<ProductEntity> productsEntities = productRepository.findAll();
+        List<ProductEntity> productEntityList = productRepository.findAll();
 
-        List<Product> products = productsEntities
+        List<Product> products = productEntityList
                 .stream()
-                .map(product -> productMapper.mapToProduct(product, categoryMapper))
+                .map(product -> productMapper.mapProductEntityToProduct(product))
                 .collect(Collectors.toList());
 
         return products;
     }
 
     @Override
-    public void deleteProductById(Long id) {
-        Optional<ProductEntity> productOptional = productRepository.findById(id);
+    public List<Product> getAllProductsByCategory(Long categoryId) {
+        List<ProductEntity> productEntityList = productRepository.findByCategoryId(categoryId);
 
-        if (productOptional.isPresent()) {
-            productRepository.delete(productOptional.get());
-        }
+        List<Product> productList = productEntityList
+                .stream()
+                .map(productEntity -> productMapper.mapProductEntityToProduct(productEntity))
+                .collect(Collectors.toList());
+
+        return productList;
+    }
+
+    @Override
+    public void deleteProductById(Long id) {
+        ProductEntity productEntity = productRepository
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
+
+        productRepository.delete(productEntity);
     }
 
     @Override
     public Product updateProduct(Long id, Product productToUpdate) {
-        ProductEntity productEntity = productRepository.findById(id)
+        ProductEntity productEntity = productRepository
+                .findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
 
         if (productToUpdate.getName() != null) {
@@ -83,31 +106,33 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
             productEntity.setDescription(productToUpdate.getDescription());
         }
 
-        if (productToUpdate.getImage() != null) {
+        if (productEntity.getImage() != null) {
             productEntity.setImage(productToUpdate.getImage());
         }
 
         if (productToUpdate.getCategory() != null) {
-            productEntity
-                    .setCategory(categoryMapper.mapToCategoryEntity(productToUpdate.getCategory()));
+            CategoryEntity categoryEntity = categoryRepository
+                    .findByName(productToUpdate.getCategory().getName())
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Category with name: " + productToUpdate.getCategory().getName() + " not found."));
+
+            productEntity.setCategory(categoryEntity);
         }
 
         ProductEntity savedProductEntity = productRepository.save(productEntity);
 
-        return productMapper.mapToProduct(savedProductEntity, categoryMapper);
+        return productMapper.mapProductEntityToProduct(savedProductEntity);
     }
 
     @Override
     public void activeProduct(Long id, ProductStatus status) {
-        Optional<ProductEntity> productEntityOptinal = productRepository.findById(id);
+        ProductEntity productEntity = productRepository
+                .findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
 
-        if (productEntityOptinal.isPresent()) {
-            ProductEntity productEntity = productEntityOptinal.get();
+        productEntity.setStatus(status);
 
-            productEntity.setStatus(status);
-
-            productRepository.save(productEntity);
-        }        
+        productRepository.save(productEntity);
     }
 
 }

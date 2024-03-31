@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,24 +17,29 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.facugl.ecommerce.server.application.mapper.ApplicationCategoryMapper;
 import com.facugl.ecommerce.server.application.mapper.ApplicationProductMapper;
+import com.facugl.ecommerce.server.application.mapper.ApplicationVariantMapper;
 import com.facugl.ecommerce.server.application.port.input.categories.ActiveCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.CreateCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllCategoriesUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllMainCategoriesUseCase;
-import com.facugl.ecommerce.server.application.port.input.categories.GetAllProductsByCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllSubCategoriesUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.UpdateCategoryUseCase;
-import com.facugl.ecommerce.server.application.port.output.CategoryOutputPort;
+import com.facugl.ecommerce.server.application.port.input.products.GetAllProductsUseCase;
+import com.facugl.ecommerce.server.application.port.input.variants.GetAllVariantsUseCase;
+import com.facugl.ecommerce.server.application.service.CategoryService;
 import com.facugl.ecommerce.server.common.WebAdapter;
 import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
 import com.facugl.ecommerce.server.domain.model.products.Product;
+import com.facugl.ecommerce.server.domain.model.variants.Variant;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request.CategoryRequest;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.CategoryResponse;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.ProductResponse;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.VariantResponse;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.categories.CreateCategoryValidationGroup;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.categories.UpdateCategoryValidationGroup;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -42,109 +48,127 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/categories")
 public class CategoryRestAdapter {
 
-        private final ApplicationCategoryMapper categoryMapper;
-        private final ApplicationProductMapper productMapper;
+	private final ApplicationCategoryMapper categoryMapper;
+	private final ApplicationProductMapper productMapper;
+	private final ApplicationVariantMapper variantMapper;
 
-        private final CreateCategoryUseCase createCategoryUseCase;
-        private final GetCategoryUseCase getCategoryUseCase;
-        private final GetAllCategoriesUseCase getAllCategoriesUseCase;
-        private final GetAllMainCategoriesUseCase getAllMainCategoriesUseCase;
-        private final GetAllSubCategoriesUseCase getAllSubCategoriesUseCase;
-        private final UpdateCategoryUseCase updateCategoryUseCase;
-        private final ActiveCategoryUseCase activeCategoryUseCase;
-        private final GetAllProductsByCategoryUseCase getAllProductsByCategoryUseCase;
+	private final CreateCategoryUseCase createCategoryUseCase;
+	private final GetCategoryUseCase getCategoryUseCase;
+	private final GetAllCategoriesUseCase getAllCategoriesUseCase;
+	private final GetAllMainCategoriesUseCase getAllMainCategoriesUseCase;
+	private final GetAllSubCategoriesUseCase getAllSubCategoriesUseCase;
+	private final UpdateCategoryUseCase updateCategoryUseCase;
+	private final ActiveCategoryUseCase activeCategoryUseCase;
+	private final GetAllProductsUseCase getAllProductsUseCase;
+	private final GetAllVariantsUseCase getAllVariantsUseCase;
 
-        private final CategoryOutputPort categoryOutputPort;
+	private final CategoryService categoryService;
 
-        @PostMapping
-        public ResponseEntity<CategoryResponse> createCategory(@RequestBody @Valid CategoryRequest categoryToCreate) {
-                Category category = categoryMapper.mapToCategory(categoryToCreate, categoryOutputPort);
+	@PostMapping
+	public ResponseEntity<CategoryResponse> createCategory(
+			@RequestBody @Validated(CreateCategoryValidationGroup.class) CategoryRequest categoryToCreate) {
+		Category category = categoryMapper.mapCategoryRequestToCategory(categoryToCreate, categoryService);
 
-                Category createdCategory = createCategoryUseCase.createCategory(category);
+		Category createdCategory = createCategoryUseCase.createCategory(category);
 
-                return ResponseEntity
-                                .status(HttpStatus.CREATED)
-                                .body(categoryMapper.mapToCategoryResponse(createdCategory));
-        }
+		return ResponseEntity
+				.status(HttpStatus.CREATED)
+				.body(categoryMapper.mapCategoryToCategoryResponse(createdCategory));
+	}
 
-        @GetMapping
-        public ResponseEntity<List<CategoryResponse>> getAllCategories() {
-                List<CategoryResponse> categories = getAllCategoriesUseCase.getAllCategories()
-                                .stream()
-                                .map(categoryMapper::mapToCategoryResponse)
-                                .collect(Collectors.toList());
+	@GetMapping
+	public ResponseEntity<List<CategoryResponse>> getAllCategories() {
+		List<CategoryResponse> categories = getAllCategoriesUseCase.getAllCategories()
+				.stream()
+				.map(categoryMapper::mapCategoryToCategoryResponse)
+				.collect(Collectors.toList());
 
-                return ResponseEntity
-                                .status(HttpStatus.OK)
-                                .body(categories);
-        }
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(categories);
+	}
 
-        @GetMapping("/{id}")
-        public ResponseEntity<CategoryResponse> getOneCategory(@PathVariable Long id) {
-                Category category = getCategoryUseCase.getCategoryById(id);
+	@GetMapping("/{id}")
+	public ResponseEntity<CategoryResponse> getOneCategory(@PathVariable Long id) {
+		Category category = getCategoryUseCase.getCategoryById(id);
 
-                return ResponseEntity
-                                .status(HttpStatus.OK)
-                                .body(categoryMapper.mapToCategoryResponse(category));
-        }
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(categoryMapper.mapCategoryToCategoryResponse(category));
+	}
 
-        @GetMapping("/main")
-        public ResponseEntity<List<CategoryResponse>> getAllMainCategories() {
-                List<CategoryResponse> mainCategories = getAllMainCategoriesUseCase.getAllMainCategories()
-                                .stream()
-                                .map(categoryMapper::mapToCategoryResponse)
-                                .collect(Collectors.toList());
+	@GetMapping("/main")
+	public ResponseEntity<List<CategoryResponse>> getAllMainCategories() {
+		List<CategoryResponse> mainCategories = getAllMainCategoriesUseCase.getAllMainCategories()
+				.stream()
+				.map(categoryMapper::mapCategoryToCategoryResponse)
+				.collect(Collectors.toList());
 
-                return ResponseEntity
-                                .status(HttpStatus.OK)
-                                .body(mainCategories);
-        }
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(mainCategories);
+	}
 
-        @GetMapping("/main/{parentId}/subcategories")
-        public ResponseEntity<List<CategoryResponse>> getSubcategories(@PathVariable Long parentId) {
-                List<CategoryResponse> subCategories = getAllSubCategoriesUseCase.getAllSubCategories(parentId)
-                                .stream()
-                                .map(categoryMapper::mapToCategoryResponse)
-                                .collect(Collectors.toList());
+	@GetMapping("/main/{parentId}/subcategories")
+	public ResponseEntity<List<CategoryResponse>> getSubcategories(@PathVariable Long parentId) {
+		List<CategoryResponse> subCategories = getAllSubCategoriesUseCase.getAllSubCategories(parentId)
+				.stream()
+				.map(categoryMapper::mapCategoryToCategoryResponse)
+				.collect(Collectors.toList());
 
-                return ResponseEntity
-                                .status(HttpStatus.OK)
-                                .body(subCategories);
-        }
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(subCategories);
+	}
 
-        @PutMapping("/{id}")
-        public ResponseEntity<CategoryResponse> updateCategory(
-                        @PathVariable Long id,
-                        @RequestBody @Valid CategoryRequest categoryToUpdate) {
-                Category category = categoryMapper.mapToCategory(categoryToUpdate, categoryOutputPort);
+	@PutMapping("/{id}")
+	public ResponseEntity<CategoryResponse> updateCategory(
+			@PathVariable Long id,
+			@RequestBody @Validated(UpdateCategoryValidationGroup.class) CategoryRequest categoryToUpdate) {
+		Category category = categoryMapper.mapCategoryRequestToCategory(categoryToUpdate, categoryService);
 
-                Category updatedCategory = updateCategoryUseCase.updateCategory(id, category);
+		Category updatedCategory = updateCategoryUseCase.updateCategory(id, category);
 
-                return ResponseEntity
-                                .status(HttpStatus.OK)
-                                .body(categoryMapper.mapToCategoryResponse(updatedCategory));
-        }
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(categoryMapper.mapCategoryToCategoryResponse(updatedCategory));
+	}
 
-        @PatchMapping("/{id}/active")
-        public ResponseEntity<Void> activeCategory(@PathVariable Long id, @RequestBody CategoryStatus status) {
-                activeCategoryUseCase.activeCategory(id, status);
+	@PatchMapping("/{id}/active")
+	public ResponseEntity<Void> activeCategory(@PathVariable Long id, @RequestBody CategoryStatus status) {
+		activeCategoryUseCase.activeCategory(id, status);
 
-                return ResponseEntity
-                                .status(HttpStatus.OK)
-                                .build();
-        }
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.build();
+	}
 
-        @GetMapping("/{id}/products")
-        public ResponseEntity<List<ProductResponse>> getAllProducts(@PathVariable Long id) {
-                List<Product> productList = getAllProductsByCategoryUseCase.getAllProducts(id);
+	@GetMapping("/{id}/products")
+	public ResponseEntity<List<ProductResponse>> getAllProducts(@PathVariable Long id) {
+		List<Product> productList = getAllProductsUseCase.getAllProductsByCategory(id);
 
-                List<ProductResponse> productResponseList = productList.stream()
-                                .map(productMapper::mapToProductResponse)
-                                .collect(Collectors.toList());
+		List<ProductResponse> productResponseList = productList
+				.stream()
+				.map(productMapper::mapToProductResponse)
+				.collect(Collectors.toList());
 
-                return ResponseEntity
-                                .status(HttpStatus.OK)
-                                .body(productResponseList);
-        }
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(productResponseList);
+	}
+
+	@GetMapping("/{id}/variants")
+	public ResponseEntity<List<VariantResponse>> getAllVariants(@PathVariable Long id) {
+		List<Variant> variantList = getAllVariantsUseCase.getAllVariantsByCategory(id);
+
+		List<VariantResponse> variantResponseList = variantList
+				.stream()
+				.map(variantMapper::mapVariantToVariantResponse)
+				.collect(Collectors.toList());
+
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(variantResponseList);
+	}
 
 }

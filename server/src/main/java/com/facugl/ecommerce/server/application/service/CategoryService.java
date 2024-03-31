@@ -1,6 +1,7 @@
 package com.facugl.ecommerce.server.application.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -8,16 +9,13 @@ import com.facugl.ecommerce.server.application.port.input.categories.ActiveCateg
 import com.facugl.ecommerce.server.application.port.input.categories.CreateCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllCategoriesUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllMainCategoriesUseCase;
-import com.facugl.ecommerce.server.application.port.input.categories.GetAllProductsByCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllSubCategoriesUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.UpdateCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.output.CategoryOutputPort;
 import com.facugl.ecommerce.server.common.UseCase;
-import com.facugl.ecommerce.server.common.exception.generic.EntityNameNotUniqueException;
 import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
-import com.facugl.ecommerce.server.domain.model.products.Product;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,25 +28,26 @@ public class CategoryService implements
         GetAllMainCategoriesUseCase,
         GetAllSubCategoriesUseCase,
         UpdateCategoryUseCase,
-        ActiveCategoryUseCase,
-        GetAllProductsByCategoryUseCase {
+        ActiveCategoryUseCase {
 
     private final CategoryOutputPort categoryOutputPort;
 
     @Transactional
     @Override
     public Category createCategory(Category category) {
-        if (categoryOutputPort.isCategoryNameUnique(category.getName())) {
-            return categoryOutputPort.createCategory(category);
-        } else {
-            throw new EntityNameNotUniqueException("The category name must be unique.");
-        }
+        return categoryOutputPort.createCategory(category);
     }
 
     @Transactional(readOnly = true)
     @Override
     public Category getCategoryById(Long id) {
         return categoryOutputPort.findCategoryById(id);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Optional<Category> getCategoryByName(String name) {
+        return categoryOutputPort.findCategoryByName(name);
     }
 
     @Transactional(readOnly = true)
@@ -72,11 +71,7 @@ public class CategoryService implements
     @Transactional
     @Override
     public Category updateCategory(Long id, Category categoryToUpdate) {
-        if (categoryOutputPort.isCategoryNameUnique(categoryToUpdate.getName())) {
-            return categoryOutputPort.updateCategory(id, categoryToUpdate);
-        } else {
-            throw new EntityNameNotUniqueException("The category name must be unique.");
-        }
+        return categoryOutputPort.updateCategory(id, categoryToUpdate);
     }
 
     @Transactional
@@ -85,12 +80,6 @@ public class CategoryService implements
         if (status == CategoryStatus.ENABLED || status == CategoryStatus.DISABLED) {
             categoryOutputPort.activeCategory(id, status);
         }
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<Product> getAllProducts(Long categoryId) {
-        return categoryOutputPort.getAllProductsByCategory(categoryId);
     }
 
 }
