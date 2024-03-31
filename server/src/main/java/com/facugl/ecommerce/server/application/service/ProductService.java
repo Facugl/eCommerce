@@ -12,8 +12,6 @@ import com.facugl.ecommerce.server.application.port.input.products.GetProductUse
 import com.facugl.ecommerce.server.application.port.input.products.UpdateProductUseCase;
 import com.facugl.ecommerce.server.application.port.output.ProductOutputPort;
 import com.facugl.ecommerce.server.common.UseCase;
-import com.facugl.ecommerce.server.common.exception.generic.EntityNameNotUniqueException;
-import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundException;
 import com.facugl.ecommerce.server.domain.model.products.Product;
 import com.facugl.ecommerce.server.domain.model.products.ProductStatus;
 
@@ -34,18 +32,13 @@ public class ProductService implements
     @Transactional
     @Override
     public Product createProduct(Product product) {
-        if (productOutputPort.isProductNameUnique(product.getName())) {
-            return productOutputPort.createProduct(product);
-        } else {
-            throw new EntityNameNotUniqueException("Product with name: " + product.getName() + " already exist.");
-        }
+        return productOutputPort.createProduct(product);
     }
 
     @Transactional(readOnly = true)
     @Override
     public Product getProductById(Long id) {
-        return productOutputPort.findProductById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
+        return productOutputPort.findProductById(id);
     }
 
     @Transactional(readOnly = true)
@@ -54,32 +47,27 @@ public class ProductService implements
         return productOutputPort.getAllProducts();
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public List<Product> getAllProductsByCategory(Long categoryId) {
+        return productOutputPort.getAllProductsByCategory(categoryId);
+    }
+
     @Transactional
     @Override
     public void deleteProductById(Long id) {
-        Product product = productOutputPort.findProductById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
-
-        productOutputPort.deleteProductById(product.getId());
+        productOutputPort.deleteProductById(id);
     }
 
     @Transactional
     @Override
     public Product updateProduct(Long id, Product productToUpdate) {
-        if (productOutputPort.isProductNameUnique(productToUpdate.getName())) {
-            return productOutputPort.updateProduct(id, productToUpdate);
-        } else {
-            throw new EntityNameNotUniqueException(
-                    "Product with name: " + productToUpdate.getName() + " already exist.");
-        }
+        return productOutputPort.updateProduct(id, productToUpdate);
     }
 
     @Transactional
     @Override
     public void activeProduct(Long id, ProductStatus status) {
-        productOutputPort.findProductById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
-
         if (status == ProductStatus.ENABLED || status == ProductStatus.DISABLED) {
             productOutputPort.activeProduct(id, status);
         }

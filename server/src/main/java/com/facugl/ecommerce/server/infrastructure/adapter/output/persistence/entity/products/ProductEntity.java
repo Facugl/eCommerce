@@ -41,11 +41,8 @@ public class ProductEntity {
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
-    @ManyToOne(
-        fetch = FetchType.LAZY,
-        cascade = CascadeType.MERGE 
-    // cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH }
-            )
+    @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH,
+            CascadeType.REFRESH })
     @JoinColumn(name = "categories_id")
     private CategoryEntity category;
 

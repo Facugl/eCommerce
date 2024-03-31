@@ -7,15 +7,15 @@ import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
 
 public interface CategoryOutputPort {
-    
+
     boolean isCategoryNameUnique(String name);
-    
-    Optional<Category> findCategoryById(Long id);
-    
+
+    Category findCategoryById(Long id);
+
     Optional<Category> findCategoryByName(String name);
-    
+
     List<Category> getAllCategories();
-    
+
     Category createCategory(Category category);
 
     List<Category> getAllMainCategories();
