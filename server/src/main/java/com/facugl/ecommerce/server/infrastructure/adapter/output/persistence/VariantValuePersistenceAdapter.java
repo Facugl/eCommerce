@@ -10,7 +10,6 @@ import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundExcept
 import com.facugl.ecommerce.server.domain.model.variantsValues.VariantValue;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.variants.VariantEntity;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.variantsValues.VariantValueEntity;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceVariantMapper;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceVariantValueMapper;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.VariantRepository;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.VariantValueRepository;
@@ -25,7 +24,6 @@ public class VariantValuePersistenceAdapter implements VariantValueOutputPort {
 	private final VariantRepository variantRepository;
 
 	private final PersistenceVariantValueMapper variantValueMapper;
-	private final PersistenceVariantMapper variantMapper;
 
 	@Override
 	public VariantValue createVariantValue(VariantValue valueToCreate) {
