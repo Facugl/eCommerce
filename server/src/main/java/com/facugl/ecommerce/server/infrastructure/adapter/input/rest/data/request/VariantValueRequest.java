@@ -4,20 +4,29 @@ import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.variantsValues.UpdateVariantValueValidationGroup;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class VariantValueRequest {
 
-    @NotBlank(message = "Name shouldn't be null or empty", groups = { CreateVariantValueValidationGroup.class })
-    @Size(min = 1, max = 5, message = "Name must be between 1 and 5 characters (inclusive)", groups = {
-            CreateVariantValueValidationGroup.class, UpdateVariantValueValidationGroup.class })
-    private String value;
+	@NotBlank(message = "Name shouldn't be null or empty", groups = { CreateVariantValueValidationGroup.class })
+	@Size(min = 1, max = 20, message = "Name must be between 1 and 20 characters (inclusive)", groups = {
+			CreateVariantValueValidationGroup.class, UpdateVariantValueValidationGroup.class })
+	private String value;
 
-    @NotBlank(message = "Name shouldn't be null or empty", groups = CreateVariantValueValidationGroup.class)
-    @Size(min = 4, max = 15, message = "Name must be between 4 and 15 characters (inclusive)", groups = {
-            CreateVariantValueValidationGroup.class, UpdateVariantValueValidationGroup.class })
-    private String variantName;
+	@NotNull(message = "Variant ID cannot be null", groups = {
+			CreateVariantValueValidationGroup.class })
+	@Positive(message = "Variant ID must be a positive number", groups = {
+			CreateVariantValueValidationGroup.class, UpdateVariantValueValidationGroup.class })
+	private Long variantId;
 
 }

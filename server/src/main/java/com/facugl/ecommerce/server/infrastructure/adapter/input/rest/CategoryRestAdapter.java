@@ -22,11 +22,11 @@ import com.facugl.ecommerce.server.application.port.input.categories.ActiveCateg
 import com.facugl.ecommerce.server.application.port.input.categories.CreateCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllCategoriesUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllMainCategoriesUseCase;
+import com.facugl.ecommerce.server.application.port.input.categories.GetAllProductsByCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllSubCategoriesUseCase;
+import com.facugl.ecommerce.server.application.port.input.categories.GetAllVariantsByCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.UpdateCategoryUseCase;
-import com.facugl.ecommerce.server.application.port.input.products.GetAllProductsUseCase;
-import com.facugl.ecommerce.server.application.port.input.variants.GetAllVariantsUseCase;
 import com.facugl.ecommerce.server.application.service.CategoryService;
 import com.facugl.ecommerce.server.common.WebAdapter;
 import com.facugl.ecommerce.server.domain.model.categories.Category;
@@ -59,15 +59,15 @@ public class CategoryRestAdapter {
 	private final GetAllSubCategoriesUseCase getAllSubCategoriesUseCase;
 	private final UpdateCategoryUseCase updateCategoryUseCase;
 	private final ActiveCategoryUseCase activeCategoryUseCase;
-	private final GetAllProductsUseCase getAllProductsUseCase;
-	private final GetAllVariantsUseCase getAllVariantsUseCase;
+	private final GetAllProductsByCategoryUseCase getAllProductsByCategoryUseCase;
+	private final GetAllVariantsByCategoryUseCase getAllVariantsByCategoryUseCase;
 
 	private final CategoryService categoryService;
 
 	@PostMapping
 	public ResponseEntity<CategoryResponse> createCategory(
 			@RequestBody @Validated(CreateCategoryValidationGroup.class) CategoryRequest categoryToCreate) {
-		Category category = categoryMapper.mapCategoryRequestToCategory(categoryToCreate, categoryService);
+		Category category = categoryService.mapCategoryRequestToCategory(categoryToCreate);
 
 		Category createdCategory = createCategoryUseCase.createCategory(category);
 
@@ -109,9 +109,9 @@ public class CategoryRestAdapter {
 				.body(mainCategories);
 	}
 
-	@GetMapping("/main/{parentId}/subcategories")
-	public ResponseEntity<List<CategoryResponse>> getSubcategories(@PathVariable Long parentId) {
-		List<CategoryResponse> subCategories = getAllSubCategoriesUseCase.getAllSubCategories(parentId)
+	@GetMapping("/main/{id}/subcategories")
+	public ResponseEntity<List<CategoryResponse>> getSubcategories(@PathVariable Long id) {
+		List<CategoryResponse> subCategories = getAllSubCategoriesUseCase.getAllSubCategories(id)
 				.stream()
 				.map(categoryMapper::mapCategoryToCategoryResponse)
 				.collect(Collectors.toList());
@@ -125,7 +125,7 @@ public class CategoryRestAdapter {
 	public ResponseEntity<CategoryResponse> updateCategory(
 			@PathVariable Long id,
 			@RequestBody @Validated(UpdateCategoryValidationGroup.class) CategoryRequest categoryToUpdate) {
-		Category category = categoryMapper.mapCategoryRequestToCategory(categoryToUpdate, categoryService);
+		Category category = categoryService.mapCategoryRequestToCategory(categoryToUpdate);
 
 		Category updatedCategory = updateCategoryUseCase.updateCategory(id, category);
 
@@ -145,11 +145,11 @@ public class CategoryRestAdapter {
 
 	@GetMapping("/{id}/products")
 	public ResponseEntity<List<ProductResponse>> getAllProducts(@PathVariable Long id) {
-		List<Product> productList = getAllProductsUseCase.getAllProductsByCategory(id);
+		List<Product> productList = getAllProductsByCategoryUseCase.getAllProductsByCategory(id);
 
 		List<ProductResponse> productResponseList = productList
 				.stream()
-				.map(productMapper::mapToProductResponse)
+				.map(productMapper::mapProductToProductResponse)
 				.collect(Collectors.toList());
 
 		return ResponseEntity
@@ -159,7 +159,7 @@ public class CategoryRestAdapter {
 
 	@GetMapping("/{id}/variants")
 	public ResponseEntity<List<VariantResponse>> getAllVariants(@PathVariable Long id) {
-		List<Variant> variantList = getAllVariantsUseCase.getAllVariantsByCategory(id);
+		List<Variant> variantList = getAllVariantsByCategoryUseCase.getAllVariantsByCategory(id);
 
 		List<VariantResponse> variantResponseList = variantList
 				.stream()

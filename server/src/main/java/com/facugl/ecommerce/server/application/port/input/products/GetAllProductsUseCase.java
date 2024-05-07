@@ -8,6 +8,4 @@ public interface GetAllProductsUseCase {
 
     List<Product> getAllProducts();
 
-    List<Product> getAllProductsByCategory(Long categoryId);
-
 }

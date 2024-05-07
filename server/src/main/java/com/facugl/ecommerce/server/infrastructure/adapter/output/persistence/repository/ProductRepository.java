@@ -13,8 +13,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     @Query("SELECT p FROM ProductEntity p WHERE p.category.id = :categoryId")
     List<ProductEntity> findByCategoryId(@Param("categoryId") Long categoryId);
 
-    @Query("SELECT p FROM ProductEntity p WHERE p.category.name = :categoryName AND p.name = :name")
-    List<ProductEntity> findByCategoryNameAndName(@Param("categoryName") String categoryName,
-            @Param("name") String name);
+    // @Query("SELECT p FROM ProductEntity p WHERE p.categoryId = :categoryId AND p.name = :name")
+    // List<ProductEntity> findByCategoryIdAndName(@Param("categoryId") Long categoryId,
+    //         @Param("name") String name);
 
 }

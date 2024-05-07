@@ -16,16 +16,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.facugl.ecommerce.server.application.mapper.ApplicationVariantMapper;
+import com.facugl.ecommerce.server.application.mapper.ApplicationVariantValueMapper;
 import com.facugl.ecommerce.server.application.port.input.variants.CreateVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.variants.DeleteVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.variants.GetAllVariantsUseCase;
+import com.facugl.ecommerce.server.application.port.input.variants.GetAllVariantsValuesByVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.variants.GetVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.variants.UpdateVariantUseCase;
-import com.facugl.ecommerce.server.application.service.CategoryService;
+import com.facugl.ecommerce.server.application.service.VariantService;
 import com.facugl.ecommerce.server.common.WebAdapter;
 import com.facugl.ecommerce.server.domain.model.variants.Variant;
+import com.facugl.ecommerce.server.domain.model.variantsValues.VariantValue;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request.VariantRequest;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.VariantResponse;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.VariantValueResponse;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.variants.CreateVariantValidationGroup;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.variants.UpdateVariantValidationGroup;
 
@@ -38,19 +42,21 @@ import lombok.RequiredArgsConstructor;
 public class VariantRestAdapter {
 
     private final ApplicationVariantMapper variantMapper;
+    private final ApplicationVariantValueMapper variantValueMapper;
 
     private final CreateVariantUseCase createVariantUseCase;
     private final GetVariantUseCase getVariantUseCase;
     private final GetAllVariantsUseCase getAllVariantsUseCase;
+    private final GetAllVariantsValuesByVariantUseCase getAllVariantsValuesByVariantUseCase;
     private final DeleteVariantUseCase deleteVariantUseCase;
     private final UpdateVariantUseCase updateVariantUseCase;
 
-    private final CategoryService categoryService;
+    private final VariantService variantService;
 
     @PostMapping
     public ResponseEntity<VariantResponse> createVariant(
             @RequestBody @Validated(CreateVariantValidationGroup.class) VariantRequest variantToCreate) {
-        Variant variant = variantMapper.mapVariantRequestToVariant(variantToCreate, categoryService);
+        Variant variant = variantService.mapVariantRequestToVariant(variantToCreate);
 
         Variant createdVariant = createVariantUseCase.createVariant(variant);
 
@@ -91,13 +97,27 @@ public class VariantRestAdapter {
     public ResponseEntity<VariantResponse> updateVariant(
             @PathVariable Long id,
             @RequestBody @Validated(UpdateVariantValidationGroup.class) VariantRequest variantToUpdate) {
-        Variant variant = variantMapper.mapVariantRequestToVariant(variantToUpdate, categoryService);
+        Variant variant = variantService.mapVariantRequestToVariant(variantToUpdate);
 
         Variant updatedVariant = updateVariantUseCase.updateVariant(id, variant);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(variantMapper.mapVariantToVariantResponse(updatedVariant));
+    }
+
+    @GetMapping("/{id}/values")
+    public ResponseEntity<List<VariantValueResponse>> getAllVariantValues(@PathVariable Long id) {
+        List<VariantValue> variantValueList = getAllVariantsValuesByVariantUseCase.getAllVariantsValuesByVariant(id);
+
+        List<VariantValueResponse> variantValueResponseList = variantValueList
+                .stream()
+                .map(variantValueMapper::mapVariantValueToVariantValueResponse)
+                .collect(Collectors.toList());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(variantValueResponseList);
     }
 
 }

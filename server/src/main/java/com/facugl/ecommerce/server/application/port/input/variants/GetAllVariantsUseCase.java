@@ -8,6 +8,4 @@ public interface GetAllVariantsUseCase {
 
     List<Variant> getAllVariants();
 
-    List<Variant> getAllVariantsByCategory(Long categoryId);
-
 }

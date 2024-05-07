@@ -16,8 +16,8 @@ public interface VariantRepository extends JpaRepository<VariantEntity, Long> {
     @Query("SELECT v FROM VariantEntity v WHERE v.category.id = :categoryId")
     List<VariantEntity> findByCategoryId(@Param("categoryId") Long categoryId);
 
-    @Query("SELECT v FROM VariantEntity v WHERE v.category.name = :categoryName AND v.name = :variantName")
-    List<VariantEntity> findByCategoryNameAndName(@Param("categoryName") String categoryName,
-            @Param("variantName") String variantName);
+    // @Query("SELECT v FROM VariantEntity v WHERE v.categoryId = :categoryId AND v.name = :variantName")
+    // List<VariantEntity> findByCategoryIdAndName(@Param("categoryId") Long categoryId,
+    //         @Param("variantName") String variantName);
 
 }

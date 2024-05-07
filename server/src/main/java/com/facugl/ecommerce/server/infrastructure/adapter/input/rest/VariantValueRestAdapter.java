@@ -21,7 +21,7 @@ import com.facugl.ecommerce.server.application.port.input.variantsValues.DeleteV
 import com.facugl.ecommerce.server.application.port.input.variantsValues.GetAllVariantsValuesUseCase;
 import com.facugl.ecommerce.server.application.port.input.variantsValues.GetVariantValueUseCase;
 import com.facugl.ecommerce.server.application.port.input.variantsValues.UpdateVariantValueUseCase;
-import com.facugl.ecommerce.server.application.service.VariantService;
+import com.facugl.ecommerce.server.application.service.VariantValueService;
 import com.facugl.ecommerce.server.common.WebAdapter;
 import com.facugl.ecommerce.server.domain.model.variantsValues.VariantValue;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request.VariantValueRequest;
@@ -32,7 +32,7 @@ import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RequestMapping("/variants/values")
+@RequestMapping("/variantsValues")
 @RestController
 @WebAdapter
 public class VariantValueRestAdapter {
@@ -45,19 +45,18 @@ public class VariantValueRestAdapter {
     private final UpdateVariantValueUseCase updateVariantValueUseCase;
     private final DeleteVariantValueUseCase deleteVariantValueUseCase;
 
-    private final VariantService variantService;
+    private final VariantValueService variantValueService;
 
     @PostMapping
     public ResponseEntity<VariantValueResponse> createVariantValue(
             @RequestBody @Validated(CreateVariantValueValidationGroup.class) VariantValueRequest valueToCreate) {
-        VariantValue variantValue = variantValueMapper.mapVariantValueRequestToVariantValue(valueToCreate,
-                variantService);
+        VariantValue variantValue = variantValueService.mapVariantValueRequestToVariantValue(valueToCreate);
 
         VariantValue createdVariantValue = createVariantValueUseCase.createVariantValue(variantValue);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(variantValueMapper.mapToVariantResponse(createdVariantValue));
+                .body(variantValueMapper.mapVariantValueToVariantValueResponse(createdVariantValue));
     }
 
     @GetMapping("/{id}")
@@ -66,7 +65,7 @@ public class VariantValueRestAdapter {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(variantValueMapper.mapToVariantResponse(variantValue));
+                .body(variantValueMapper.mapVariantValueToVariantValueResponse(variantValue));
     }
 
     @GetMapping
@@ -77,7 +76,7 @@ public class VariantValueRestAdapter {
                 .status(HttpStatus.OK)
                 .body((variantValuesList
                         .stream()
-                        .map(variantValueMapper::mapToVariantResponse)
+                        .map(variantValueMapper::mapVariantValueToVariantValueResponse)
                         .collect(Collectors.toList())));
     }
 
@@ -85,14 +84,13 @@ public class VariantValueRestAdapter {
     public ResponseEntity<VariantValueResponse> updateVariantValue(
             @PathVariable Long id,
             @RequestBody @Validated(UpdateVariantValueValidationGroup.class) VariantValueRequest valueToUpdate) {
-        VariantValue variantValue = variantValueMapper.mapVariantValueRequestToVariantValue(valueToUpdate,
-                variantService);
+        VariantValue variantValue = variantValueService.mapVariantValueRequestToVariantValue(valueToUpdate);
 
         VariantValue updatedVariantValue = updateVariantValueUseCase.updateVariantValue(id, variantValue);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(variantValueMapper.mapToVariantResponse(updatedVariantValue));
+                .body(variantValueMapper.mapVariantValueToVariantValueResponse(updatedVariantValue));
     }
 
     @DeleteMapping("/{id}")

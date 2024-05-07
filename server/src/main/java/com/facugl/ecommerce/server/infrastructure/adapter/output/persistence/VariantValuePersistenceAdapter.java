@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import com.facugl.ecommerce.server.application.port.output.VariantValueOutputPort;
 import com.facugl.ecommerce.server.common.PersistenceAdapter;
-import com.facugl.ecommerce.server.common.exception.generic.EntityNameNotUniqueException;
+import com.facugl.ecommerce.server.common.exception.generic.EntityAlreadyExistsException;
 import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundException;
 import com.facugl.ecommerce.server.domain.model.variantsValues.VariantValue;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.variants.VariantEntity;
@@ -27,27 +27,27 @@ public class VariantValuePersistenceAdapter implements VariantValueOutputPort {
 
 	@Override
 	public VariantValue createVariantValue(VariantValue valueToCreate) {
-		String value = valueToCreate.getValue();
-		String variantName = valueToCreate.getVariant().getName();
+		Long variantId = valueToCreate.getVariant().getId();
 
 		VariantEntity variantEntity = variantRepository
-				.findByName(variantName)
-				.orElseThrow(() -> new EntityNotFoundException("Variant with name: " + variantName + " not found."));
+				.findById(variantId)
+				.orElseThrow(() -> new EntityNotFoundException("Variant with id: " + variantId + " not found."));
 
-		List<VariantValueEntity> variantValueEntityList = variantValueRepository
-				.findyByVariantNameAndValue(variantName, value);
+		List<VariantValueEntity> variantValueEntityList = variantEntity.getVariantValues();
 
-		if (variantValueEntityList.isEmpty()) {
-			VariantValueEntity variantValueEntity = variantValueMapper
-					.mapVariantValueToVariantValueEntity(valueToCreate);
+		VariantValueEntity variantValueEntity = variantValueMapper
+				.mapVariantValueToVariantValueEntity(valueToCreate);
 
+		if (!variantValueEntityList.contains(variantValueEntity)) {
 			variantValueEntity.setVariant(variantEntity);
 
 			variantValueRepository.save(variantValueEntity);
 
 			return variantValueMapper.mapVariantValueEntityToVariantValue(variantValueEntity);
 		} else {
-			throw new EntityNameNotUniqueException("Variant with value: " + valueToCreate.getValue() + " already exist.");
+			throw new EntityAlreadyExistsException(
+					"Variant value with id: " + variantValueEntity.getId() + " already exists in variant with id: "
+							+ variantId);
 		}
 	}
 
@@ -89,10 +89,12 @@ public class VariantValuePersistenceAdapter implements VariantValueOutputPort {
 		}
 
 		if (valueToUpdate.getVariant() != null) {
+			Long variantId = valueToUpdate.getVariant().getId();
+
 			VariantEntity variantEntity = variantRepository
-					.findByName(valueToUpdate.getVariant().getName())
+					.findById(variantId)
 					.orElseThrow(() -> new EntityNotFoundException(
-							"Variant with name: " + valueToUpdate.getVariant().getName() + " not found."));
+							"Variant with name: " + variantId + " not found."));
 
 			variantValueEntity.setVariant(variantEntity);
 		}
