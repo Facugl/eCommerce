@@ -1,0 +1,915 @@
+create table categories (id bigint not null auto_increment, name varchar(255) not null, status enum ('ENABLED','DISABLED') not null, parent_category bigint, primary key (id)) engine=InnoDB | 2024-05-07 09:59:40.181 | took 3310 ms | statement - connection 1
+create table products (id bigint not null auto_increment, description varchar(255), images varbinary(255) not null, name varchar(255) not null, status enum ('ENABLED','DISABLED') not null, categories_id bigint not null, primary key (id)) engine=InnoDB | 2024-05-07 09:59:41.431 | took 1249 ms | statement - connection 1
+create table products_details (products_variants_id bigint not null, variants_values_id bigint not null, primary key (products_variants_id, variants_values_id)) engine=InnoDB | 2024-05-07 09:59:42.384 | took 937 ms | statement - connection 1
+create table products_variants (id bigint not null auto_increment, description varchar(255) not null, images varbinary(255) not null, price decimal(38,2) not null, sku varchar(255) not null, stock integer not null, products_id bigint not null, primary key (id)) engine=InnoDB | 2024-05-07 09:59:43.09 | took 611 ms | statement - connection 1
+create table variants (id bigint not null auto_increment, name varchar(255) not null, categories_id bigint not null, primary key (id)) engine=InnoDB | 2024-05-07 09:59:43.947 | took 927 ms | statement - connection 1
+create table variants_values (id bigint not null auto_increment, value varchar(255) not null, variants_id bigint not null, primary key (id)) engine=InnoDB | 2024-05-07 09:59:44.431 | took 491 ms | statement - connection 1
+alter table categories drop index UK_t8o6pivur7nn124jehx7cygw5 | 2024-05-07 09:59:44.994 | took 559 ms | statement - connection 1
+alter table categories add constraint UK_t8o6pivur7nn124jehx7cygw5 unique (name) | 2024-05-07 09:59:45.947 | took 950 ms | statement - connection 1
+alter table products drop index UK_o61fmio5yukmmiqgnxf8pnavn | 2024-05-07 09:59:45.978 | took 20 ms | statement - connection 1
+alter table products add constraint UK_o61fmio5yukmmiqgnxf8pnavn unique (name) | 2024-05-07 09:59:46.525 | took 533 ms | statement - connection 1
+alter table products_variants drop index UK_onsuqtgqbo29atvr2f8teo9ah | 2024-05-07 09:59:46.540 | took 11 ms | statement - connection 1
+alter table products_variants add constraint UK_onsuqtgqbo29atvr2f8teo9ah unique (sku) | 2024-05-07 09:59:46.994 | took 447 ms | statement - connection 1
+alter table variants drop index UK_tdbt0xrggjpa1muu206g6ie2y | 2024-05-07 09:59:46.994 | took 9 ms | statement - connection 1
+alter table variants add constraint UK_tdbt0xrggjpa1muu206g6ie2y unique (name) | 2024-05-07 09:59:47.337 | took 343 ms | statement - connection 1
+alter table variants_values drop index UK_km6xjdsloh63f5yjrdt8b530u | 2024-05-07 09:59:47.353 | took 7 ms | statement - connection 1
+alter table variants_values add constraint UK_km6xjdsloh63f5yjrdt8b530u unique (value) | 2024-05-07 09:59:47.822 | took 469 ms | statement - connection 1
+alter table categories add constraint FKg4vpokbn2d1bdlgih0qfo72n0 foreign key (parent_category) references categories (id) | 2024-05-07 09:59:50.25 | took 2195 ms | statement - connection 1
+alter table products add constraint FKgro094vh0dp0tly1225wk8u37 foreign key (categories_id) references categories (id) | 2024-05-07 09:59:52.247 | took 2225 ms | statement - connection 1
+alter table products_details add constraint FKljkat9b16ng238n38jqb09xf2 foreign key (variants_values_id) references variants_values (id) | 2024-05-07 09:59:53.778 | took 1520 ms | statement - connection 1
+alter table products_details add constraint FKpssy3w4luukeyewgsm7fysmo8 foreign key (products_variants_id) references products_variants (id) | 2024-05-07 09:59:55.231 | took 1454 ms | statement - connection 1
+alter table products_variants add constraint FKo9bxvx7xlrpn9nxv2ktmbrj11 foreign key (products_id) references products (id) | 2024-05-07 10:00:00.75 | took 4844 ms | statement - connection 1
+alter table variants add constraint FKad6us22s38v900ew0emhka5kk foreign key (categories_id) references categories (id) | 2024-05-07 10:00:03.663 | took 3571 ms | statement - connection 1
+alter table variants_values add constraint FKb5s8s62f77ddl5iq8u2qxx72e foreign key (variants_id) references variants (id) | 2024-05-07 10:00:06.788 | took 3131 ms | statement - connection 1
+ | 2024-05-07 10:02:25.564 | took 2 ms | commit - connection 2
+select count(ce1_0.id)=0 from categories ce1_0 where lower(ce1_0.name)=lower('Clothing') | 2024-05-07 10:02:28.431 | took 235 ms | statement - connection 2
+insert into categories (name,parent_category,status) values ('Clothing',NULL,'ENABLED') | 2024-05-07 10:02:31.470 | took 151 ms | statement - connection 2
+ | 2024-05-07 10:02:31.860 | took 84 ms | commit - connection 2
+ | 2024-05-07 10:03:17.373 | took 2 ms | commit - connection 3
+select count(ce1_0.id)=0 from categories ce1_0 where lower(ce1_0.name)=lower('Men''s Clothing') | 2024-05-07 10:03:17.436 | took 31 ms | statement - connection 3
+insert into categories (name,parent_category,status) values ('Men''s Clothing',NULL,'ENABLED') | 2024-05-07 10:03:17.467 | took 31 ms | statement - connection 3
+ | 2024-05-07 10:04:14.625 | took 57136 ms | commit - connection 3
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 | 2024-05-07 10:04:53.625 | took 2 ms | statement - connection 4
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 10:04:54.125 | took 47 ms | statement - connection 4
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 10:04:54.235 | took 32 ms | statement - connection 4
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 10:04:54.235 | took 3 ms | statement - connection 4
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 10:04:54.250 | took 6 ms | statement - connection 4
+ | 2024-05-07 10:04:54.250 | took 2 ms | commit - connection 4
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 10:06:25.27 | took 16 ms | statement - connection 5
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 10:06:25.43 | took 2 ms | statement - connection 5
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 10:06:25.59 | took 3 ms | statement - connection 5
+ | 2024-05-07 10:06:25.74 | took 4 ms | commit - connection 5
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 10:06:25.106 | took 4 ms | statement - connection 5
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.name='Clothing' | 2024-05-07 10:06:25.215 | took 19 ms | statement - connection 5
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 10:06:25.262 | took 9 ms | statement - connection 5
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 10:06:25.277 | took 8 ms | statement - connection 5
+update categories set name='Men''s Clothing',parent_category=1,status='ENABLED' where id=2 | 2024-05-07 10:06:25.496 | took 57 ms | statement - connection 5
+ | 2024-05-07 10:06:25.574 | took 77 ms | commit - connection 5
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 | 2024-05-07 10:06:30.614 | took 5 ms | statement - connection 6
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 10:06:30.631 | took 10 ms | statement - connection 6
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 10:06:30.642 | took 7 ms | statement - connection 6
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 10:06:30.659 | took 5 ms | statement - connection 6
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 10:06:30.668 | took 4 ms | statement - connection 6
+ | 2024-05-07 10:06:30.683 | took 8 ms | commit - connection 6
+ | 2024-05-07 10:07:03.489 | took 10 ms | commit - connection 7
+select count(ce1_0.id)=0 from categories ce1_0 where lower(ce1_0.name)=lower('Women''s Clothing') | 2024-05-07 10:07:03.535 | took 9 ms | statement - connection 7
+insert into categories (name,parent_category,status) values ('Women''s Clothing',NULL,'ENABLED') | 2024-05-07 10:07:03.567 | took 24 ms | statement - connection 7
+ | 2024-05-07 10:07:03.660 | took 79 ms | commit - connection 7
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 | 2024-05-07 10:07:06.497 | took 6 ms | statement - connection 8
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 10:07:06.526 | took 7 ms | statement - connection 8
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 10:07:06.530 | took 6 ms | statement - connection 8
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 10:07:06.541 | took 3 ms | statement - connection 8
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 10:07:06.575 | took 5 ms | statement - connection 8
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 10:07:06.576 | took 5 ms | statement - connection 8
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 10:07:06.594 | took 10 ms | statement - connection 8
+ | 2024-05-07 10:07:06.594 | took 1 ms | commit - connection 8
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 10:07:37.800 | took 2 ms | statement - connection 9
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 10:07:37.815 | took 5 ms | statement - connection 9
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 10:07:37.828 | took 8 ms | statement - connection 9
+ | 2024-05-07 10:07:37.832 | took 1 ms | commit - connection 9
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 10:07:37.848 | took 2 ms | statement - connection 9
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.name='Clothing' | 2024-05-07 10:07:37.869 | took 3 ms | statement - connection 9
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 10:07:37.884 | took 3 ms | statement - connection 9
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 10:07:37.902 | took 6 ms | statement - connection 9
+update categories set name='Women''s Clothing',parent_category=1,status='ENABLED' where id=3 | 2024-05-07 10:07:37.955 | took 20 ms | statement - connection 9
+ | 2024-05-07 10:07:38.116 | took 158 ms | commit - connection 9
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 | 2024-05-07 10:08:06.540 | took 5 ms | statement - connection 10
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 10:08:06.558 | took 8 ms | statement - connection 10
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 10:08:06.574 | took 4 ms | statement - connection 10
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 10:08:06.590 | took 6 ms | statement - connection 10
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 10:08:06.598 | took 2 ms | statement - connection 10
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 10:08:06.616 | took 3 ms | statement - connection 10
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 10:08:06.647 | took 17 ms | statement - connection 10
+ | 2024-05-07 10:08:06.662 | took 14 ms | commit - connection 10
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.parent_category is null | 2024-05-07 10:08:23.997 | took 3 ms | statement - connection 11
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 10:08:24.28 | took 8 ms | statement - connection 11
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 10:08:24.44 | took 2 ms | statement - connection 11
+ | 2024-05-07 10:08:24.60 | took 4 ms | commit - connection 11
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 left join categories pc1_0 on pc1_0.id=ce1_0.parent_category where pc1_0.id=1 | 2024-05-07 10:08:28.447 | took 6 ms | statement - connection 12
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 10:08:28.522 | took 2 ms | statement - connection 12
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 10:08:28.538 | took 2 ms | statement - connection 12
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 10:08:28.553 | took 7 ms | statement - connection 12
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 10:08:28.553 | took 4 ms | statement - connection 12
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 10:08:28.569 | took 3 ms | statement - connection 12
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 10:08:28.569 | took 2 ms | statement - connection 12
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 10:08:28.584 | took 2 ms | statement - connection 12
+ | 2024-05-07 10:08:28.584 | took 1 ms | commit - connection 12
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 10:12:36.15 | took 2 ms | statement - connection 13
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 10:12:36.46 | took 14 ms | statement - connection 13
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 10:12:36.46 | took 3 ms | statement - connection 13
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 10:12:36.62 | took 3 ms | statement - connection 13
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 10:12:36.62 | took 3 ms | statement - connection 13
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 10:12:36.77 | took 6 ms | statement - connection 13
+ | 2024-05-07 10:12:36.93 | took 3 ms | commit - connection 13
+insert into products (categories_id,description,images,name,status) values (2,'RGT Full Sleeve Striped Mens Sweatshirt - Buy Multicolor RGT Full Sleeve Striped Men''s Sweatshirt For Only Rs. 1535 Online in India. Shop Online For Apparels. Huge Collection of Branded Clothes Only at Flipkart.com','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A65787000000001770400000001740062687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F737765617473686972742F762F732F392F72677436303332626C75652D7267742D786C2D6F726967696E616C2D696D616565796133347179667A6577782E6A70656778','RGT Full Sleeve Striped Mens Sweatshirt','ENABLED') | 2024-05-07 10:12:36.567 | took 95 ms | statement - connection 13
+ | 2024-05-07 10:12:36.829 | took 163 ms | commit - connection 13
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 10:15:04.406 | took 8 ms | statement - connection 14
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 10:15:04.407 | took 2 ms | statement - connection 14
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 10:15:04.422 | took 3 ms | statement - connection 14
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 10:15:04.422 | took 2 ms | statement - connection 14
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 10:15:04.438 | took 5 ms | statement - connection 14
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 10:15:04.532 | took 2 ms | statement - connection 14
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 10:15:04.547 | took 3 ms | statement - connection 14
+ | 2024-05-07 10:15:04.579 | took 2 ms | commit - connection 14
+insert into products (categories_id,description,images,name,status) values (2,'Jovial Mart Store Men''s Solid Formal Shirt (Pack of 2) Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease. Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease.','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A65787000000001770400000001740065687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F73686972742F652F392F682F333030312D6A6F7669616C2D6D6172742D73746F72652D34322D3130303078313030302D696D61656377676D336A76756767656A2E6A70656778','Jovial Mart Store Men''s Solid Formal Shirt','ENABLED') | 2024-05-07 10:15:04.719 | took 124 ms | statement - connection 14
+ | 2024-05-07 10:15:04.873 | took 22 ms | rollback - connection 14
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 10:19:33.822 | took 4 ms | statement - connection 15
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 10:19:33.853 | took 5 ms | statement - connection 15
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 10:19:33.853 | took 5 ms | statement - connection 15
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 10:19:33.885 | took 15 ms | statement - connection 15
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 10:19:33.913 | took 8 ms | statement - connection 15
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 10:19:33.929 | took 2 ms | statement - connection 15
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 10:19:33.945 | took 12 ms | statement - connection 15
+ | 2024-05-07 10:19:33.960 | took 1 ms | commit - connection 15
+insert into products (categories_id,description,images,name,status) values (2,'Jovial Mart Store Men''s Solid Formal Shirt (Pack of 2) Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease. Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease.','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A65787000000001770400000001740065687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F73686972742F652F392F682F333030312D6A6F7669616C2D6D6172742D73746F72652D34322D3130303078313030302D696D61656377676D336A76756767656A2E6A70656778','Jovial Mart Store Men''s Solid Formal Shirt','ENABLED') | 2024-05-07 10:19:33.991 | took 3 ms | statement - connection 15
+ | 2024-05-07 10:19:34.181 | took 166 ms | rollback - connection 15
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 10:21:12.626 | took 2 ms | statement - connection 17
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 10:21:12.673 | took 2 ms | statement - connection 17
+select * from `ecommerce`.`products_variants` where 1=0 | 2024-05-07 10:21:12.720 | took 3 ms | statement - connection 17
+select * from `ecommerce`.`variants_values` where 1=0 | 2024-05-07 10:21:12.735 | took 3 ms | statement - connection 17
+select * from `ecommerce`.`products` where 1=0 | 2024-05-07 10:21:12.782 | took 2 ms | statement - connection 17
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 10:21:12.876 | took 2 ms | statement - connection 17
+select * from `ecommerce`.`variants` where 1=0 | 2024-05-07 10:21:13.32 | took 3 ms | statement - connection 17
+select pe1_0.id,pe1_0.categories_id,pe1_0.description,pe1_0.images,pe1_0.name,pe1_0.status from products pe1_0 | 2024-05-07 10:21:24.637 | took 2 ms | statement - connection 18
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 10:21:24.669 | took 2 ms | statement - connection 18
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 10:21:24.691 | took 9 ms | statement - connection 18
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 10:21:24.704 | took 2 ms | statement - connection 18
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 10:21:24.721 | took 4 ms | statement - connection 18
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 10:21:24.736 | took 6 ms | statement - connection 18
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 10:21:24.736 | took 2 ms | statement - connection 18
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 10:21:24.753 | took 4 ms | statement - connection 18
+ | 2024-05-07 10:21:24.753 | took 1 ms | commit - connection 18
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 10:22:08.634 | took 7 ms | statement - connection 19
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 10:22:08.651 | took 5 ms | statement - connection 19
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 10:22:08.651 | took 2 ms | statement - connection 19
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 10:22:08.669 | took 5 ms | statement - connection 19
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 10:22:08.669 | took 2 ms | statement - connection 19
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 10:22:08.718 | took 5 ms | statement - connection 19
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 10:22:08.718 | took 2 ms | statement - connection 19
+ | 2024-05-07 10:22:08.736 | took 1 ms | commit - connection 19
+insert into products (categories_id,description,images,name,status) values (2,'Jovial Mart Store Men''s Solid Formal Shirt (Pack of 2) Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease. Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease.','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A65787000000001770400000001740065687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F73686972742F652F392F682F333030312D6A6F7669616C2D6D6172742D73746F72652D34322D3130303078313030302D696D61656377676D336A76756767656A2E6A70656778','Jovial Mart Store Men''s Solid Formal Shirt','ENABLED') | 2024-05-07 10:22:08.752 | took 2 ms | statement - connection 19
+ | 2024-05-07 10:22:08.767 | took 1 ms | rollback - connection 19
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 11:23:16.752 | took 4603 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 11:23:17.399 | took 7 ms | statement - connection 1
+select * from `ecommerce`.`products_variants` where 1=0 | 2024-05-07 11:23:18.561 | took 1082 ms | statement - connection 1
+select * from `ecommerce`.`variants_values` where 1=0 | 2024-05-07 11:23:19.90 | took 471 ms | statement - connection 1
+select * from `ecommerce`.`products` where 1=0 | 2024-05-07 11:23:19.602 | took 348 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 11:23:19.685 | took 5 ms | statement - connection 1
+select * from `ecommerce`.`variants` where 1=0 | 2024-05-07 11:23:19.991 | took 228 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 12:09:11.434 | took 14 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 12:09:11.574 | took 4 ms | statement - connection 1
+select * from `ecommerce`.`products_variants` where 1=0 | 2024-05-07 12:09:11.621 | took 4 ms | statement - connection 1
+select * from `ecommerce`.`variants_values` where 1=0 | 2024-05-07 12:09:11.637 | took 5 ms | statement - connection 1
+select * from `ecommerce`.`products` where 1=0 | 2024-05-07 12:09:11.684 | took 4 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 12:09:11.766 | took 2 ms | statement - connection 1
+select * from `ecommerce`.`variants` where 1=0 | 2024-05-07 12:09:11.844 | took 3 ms | statement - connection 1
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 12:13:42.773 | took 64 ms | statement - connection 2
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 12:13:43.227 | took 2 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 12:13:43.444 | took 86 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 12:13:43.476 | took 17 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 12:13:43.491 | took 3 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 12:13:43.554 | took 3 ms | statement - connection 2
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 12:13:43.569 | took 8 ms | statement - connection 2
+ | 2024-05-07 12:13:43.944 | took 104 ms | commit - connection 2
+insert into products (categories_id,description,images,name,status) values (2,'Jovial Mart Store Men''s Solid Formal Shirt (Pack of 2) Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease. Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease.','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A65787000000001770400000001740065687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F73686972742F652F392F682F333030312D6A6F7669616C2D6D6172742D73746F72652D34322D3130303078313030302D696D61656377676D336A76756767656A2E6A70656778','Jovial Mart Store Men''s Solid Formal Shirt','ENABLED') | 2024-05-07 12:13:44.339 | took 184 ms | statement - connection 2
+ | 2024-05-07 12:13:44.551 | took 3 ms | rollback - connection 2
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 12:15:04.547 | took 25 ms | statement - connection 3
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 12:15:04.578 | took 14 ms | statement - connection 3
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 12:15:04.594 | took 6 ms | statement - connection 3
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 12:15:04.743 | took 4 ms | statement - connection 3
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 12:15:04.779 | took 12 ms | statement - connection 3
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 12:15:04.810 | took 5 ms | statement - connection 3
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 12:15:04.826 | took 2 ms | statement - connection 3
+ | 2024-05-07 12:15:04.872 | took 8 ms | commit - connection 3
+insert into products (categories_id,description,images,name,status) values (2,'Jovial Mart Store Men''s Solid Formal Shirt (Pack of 2) Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease. Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart.','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A65787000000001770400000001740065687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F73686972742F652F392F682F333030312D6A6F7669616C2D6D6172742D73746F72652D34322D3130303078313030302D696D61656377676D336A76756767656A2E6A70656778','Jovial Mart Store Men''s Solid Formal Shirt','ENABLED') | 2024-05-07 12:15:04.904 | took 3 ms | statement - connection 3
+ | 2024-05-07 12:15:04.919 | took 2 ms | rollback - connection 3
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 12:15:23.869 | took 2 ms | statement - connection 4
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 12:15:23.894 | took 5 ms | statement - connection 4
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 12:15:23.920 | took 13 ms | statement - connection 4
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 12:15:23.955 | took 11 ms | statement - connection 4
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 12:15:23.975 | took 12 ms | statement - connection 4
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 12:15:23.996 | took 3 ms | statement - connection 4
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 12:15:24.14 | took 3 ms | statement - connection 4
+ | 2024-05-07 12:15:24.24 | took 3 ms | commit - connection 4
+insert into products (categories_id,description,images,name,status) values (2,'Jovial Mart Store Men''s Solid Formal Shirt (Pack of 2) Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease. Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart.','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A65787000000001770400000001740065687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F73686972742F652F392F682F333030312D6A6F7669616C2D6D6172742D73746F72652D34322D3130303078313030302D696D61656377676D336A76756767656A2E6A70656778','Jovial Mart Store Men''s Solid Formal Shirt','ENABLED') | 2024-05-07 12:15:24.91 | took 3 ms | statement - connection 4
+ | 2024-05-07 12:15:24.802 | took 1 ms | rollback - connection 4
+select pe1_0.id,pe1_0.categories_id,pe1_0.description,pe1_0.images,pe1_0.name,pe1_0.status from products pe1_0 | 2024-05-07 12:16:55.582 | took 3 ms | statement - connection 5
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 12:16:55.597 | took 2 ms | statement - connection 5
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 12:16:55.628 | took 5 ms | statement - connection 5
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 12:16:55.628 | took 3 ms | statement - connection 5
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 12:16:55.644 | took 5 ms | statement - connection 5
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 12:16:55.660 | took 9 ms | statement - connection 5
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 12:16:55.691 | took 19 ms | statement - connection 5
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 12:16:55.707 | took 5 ms | statement - connection 5
+ | 2024-05-07 12:16:55.707 | took 1 ms | commit - connection 5
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 12:17:43.432 | took 2 ms | statement - connection 6
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 12:17:43.446 | took 2 ms | statement - connection 6
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 12:17:43.464 | took 5 ms | statement - connection 6
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 12:17:43.464 | took 3 ms | statement - connection 6
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 12:17:43.479 | took 2 ms | statement - connection 6
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 12:17:43.497 | took 9 ms | statement - connection 6
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 12:17:43.512 | took 4 ms | statement - connection 6
+ | 2024-05-07 12:17:43.513 | took 1 ms | commit - connection 6
+insert into products (categories_id,description,images,name,status) values (2,'Jovial Mart Store Men''s Solid Formal Shirt (Pack of 2) Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart.','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A65787000000001770400000001740065687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F73686972742F652F392F682F333030312D6A6F7669616C2D6D6172742D73746F72652D34322D3130303078313030302D696D61656377676D336A76756767656A2E6A70656778','Jovial Mart Store Men''s Solid Formal Shirt','ENABLED') | 2024-05-07 12:17:44.146 | took 615 ms | statement - connection 6
+ | 2024-05-07 12:17:44.861 | took 634 ms | commit - connection 6
+select pe1_0.id,pe1_0.categories_id,pe1_0.description,pe1_0.images,pe1_0.name,pe1_0.status from products pe1_0 | 2024-05-07 12:17:59.329 | took 6 ms | statement - connection 7
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 12:17:59.344 | took 8 ms | statement - connection 7
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 12:17:59.344 | took 2 ms | statement - connection 7
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 12:17:59.378 | took 2 ms | statement - connection 7
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 12:17:59.379 | took 4 ms | statement - connection 7
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 12:17:59.395 | took 5 ms | statement - connection 7
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 12:17:59.395 | took 2 ms | statement - connection 7
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 12:17:59.412 | took 5 ms | statement - connection 7
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 12:17:59.412 | took 2 ms | statement - connection 7
+ | 2024-05-07 12:17:59.428 | took 5 ms | commit - connection 7
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 12:20:03.905 | took 4 ms | statement - connection 8
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 12:20:03.911 | took 2 ms | statement - connection 8
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 12:20:03.927 | took 3 ms | statement - connection 8
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 12:20:03.927 | took 2 ms | statement - connection 8
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 12:20:03.943 | took 5 ms | statement - connection 8
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 12:20:03.974 | took 2 ms | statement - connection 8
+ | 2024-05-07 12:20:03.990 | took 1 ms | commit - connection 8
+insert into products (categories_id,description,images,name,status) values (3,'Maggie Women''''s High Low Dress Go for a different look by getting this white and blue colored knee length high low dress that comes from the hub of Maggie. This awesome dress with the combination of beautiful colors features round neck, solid pattern and excellent stitching. Intricately crafted from georgette fabric, this pretty piece is tough and able to withstand rigorous wear. With its sleeveless adornment, this beauty number will flaunt your curvaceous figure. Get ready to flaunt off your rich fashion sense by teaming it up with a pair of high heels and matching accessories while heading out. Go for a different look by getting this white and blue colored knee length high low dress that comes from the hub of Maggie. This awesome dress with the combination of beautiful colors features round neck, solid pattern and excellent stitching. With its sleeveless adornment, this beauty number will flaunt your curvaceous figure.','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A6578700000000177040000000174005E687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F64726573732F632F682F742F312D312D6D673233332D6D61676769652D33382D6F726967696E616C2D696D61656363616E7A7A3479687677672E6A70656778','Maggie Women''s High Low Dress','ENABLED') | 2024-05-07 12:20:04.05 | took 3 ms | statement - connection 8
+ | 2024-05-07 12:20:04.257 | took 1 ms | rollback - connection 8
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 12:36:52.754 | took 33 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 12:36:52.817 | took 5 ms | statement - connection 1
+select * from `ecommerce`.`products_variants` where 1=0 | 2024-05-07 12:36:52.926 | took 51 ms | statement - connection 1
+select * from `ecommerce`.`variants_values` where 1=0 | 2024-05-07 12:36:53.51 | took 104 ms | statement - connection 1
+select * from `ecommerce`.`products` where 1=0 | 2024-05-07 12:36:53.114 | took 6 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 12:36:53.161 | took 2 ms | statement - connection 1
+select * from `ecommerce`.`variants` where 1=0 | 2024-05-07 12:36:53.192 | took 3 ms | statement - connection 1
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 12:37:29.327 | took 13 ms | statement - connection 2
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 12:37:29.842 | took 2 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 12:37:29.936 | took 3 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 12:37:29.967 | took 8 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 12:37:29.983 | took 3 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 12:37:29.999 | took 3 ms | statement - connection 2
+ | 2024-05-07 12:37:30.155 | took 1 ms | commit - connection 2
+insert into products (categories_id,description,images,name,status) values (3,'Maggie Women''s High Low Dress Go for a different look by getting this white and blue colored knee length high low dress that comes from the hub of Maggie. This awesome dress with the combination of beautiful colors features round neck, solid pattern and excellent stitching. Intricately crafted from georgette fabric, this pretty piece is tough and able to withstand rigorous wear. With its sleeveless adornment, this beauty number will flaunt your curvaceous figure. Get ready to flaunt off your rich fashion sense by teaming it up with a pair of high heels and matching accessories while heading out. Go for a different look by getting this white and blue colored knee length high low dress that comes from the hub of Maggie. This awesome dress with the combination of beautiful colors features round neck, solid pattern and excellent stitching. Intricately crafted from georgette fabric, this pretty piece is tough and able to withstand rigorous wear. With its sleeveless adornment, this beauty number will flaunt your curvaceous figure. Get ready to flaunt off your rich fashion sense by teaming it up with a pair of high heels and matching accessories while heading out.','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A6578700000000177040000000174005E687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F64726573732F632F682F742F312D312D6D673233332D6D61676769652D33382D6F726967696E616C2D696D61656363616E7A7A3479687677672E6A70656778','Maggie Women''s High Low Dress','ENABLED') | 2024-05-07 12:37:30.671 | took 129 ms | statement - connection 2
+ | 2024-05-07 12:37:30.956 | took 7 ms | rollback - connection 2
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 12:56:01.749 | took 4 ms | statement - connection 3
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 12:56:01.765 | took 2 ms | statement - connection 3
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 12:56:01.786 | took 7 ms | statement - connection 3
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 12:56:01.801 | took 3 ms | statement - connection 3
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 12:56:01.801 | took 2 ms | statement - connection 3
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 12:56:01.817 | took 3 ms | statement - connection 3
+ | 2024-05-07 12:56:01.817 | took 6 ms | commit - connection 3
+insert into products (categories_id,description,images,name,status) values (3,'Maggie Women''s High Low Dress Go for a different look by getting this white and blue colored knee length high low dress that comes from the hub of Maggie. This awesome dress with the combination of beautiful colors features round neck, solid pattern and excellent stitching. Intricately crafted from georgette fabric, this pretty piece is tough and able to withstand rigorous wear. With its sleeveless adornment, this beauty number will flaunt your curvaceous figure. Get ready to flaunt off your rich fashion sense by teaming it up with a pair of high heels and matching accessories while heading out. Go for a different look by getting this white and blue colored knee length high low dress that comes from the hub of Maggie. This awesome dress with the combination of beautiful colors features round neck, solid pattern and excellent stitching. Intricately crafted from georgette fabric, this pretty piece is tough and able to withstand rigorous wear. With its sleeveless adornment, this beauty number will flaunt your curvaceous figure. Get ready to flaunt off your rich fashion sense by teaming it up with a pair of high heels and matching accessories while heading out.','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A6578700000000177040000000174005E687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F64726573732F632F682F742F312D312D6D673233332D6D61676769652D33382D6F726967696E616C2D696D61656363616E7A7A3479687677672E6A70656778','Maggie Women''s High Low Dress','ENABLED') | 2024-05-07 12:56:01.864 | took 11 ms | statement - connection 3
+ | 2024-05-07 12:56:01.958 | took 12 ms | rollback - connection 3
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 13:30:38.738 | took 21 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 13:30:39.03 | took 6 ms | statement - connection 1
+select * from `ecommerce`.`products_variants` where 1=0 | 2024-05-07 13:30:39.86 | took 7 ms | statement - connection 1
+select * from `ecommerce`.`variants_values` where 1=0 | 2024-05-07 13:30:39.170 | took 21 ms | statement - connection 1
+select * from `ecommerce`.`products` where 1=0 | 2024-05-07 13:30:39.284 | took 7 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 13:30:39.450 | took 4 ms | statement - connection 1
+select * from `ecommerce`.`variants` where 1=0 | 2024-05-07 13:30:39.520 | took 21 ms | statement - connection 1
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 13:31:48.359 | took 39 ms | statement - connection 2
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 13:31:48.825 | took 3 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 13:31:49.90 | took 3 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 13:31:49.291 | took 178 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 13:31:49.307 | took 11 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 13:31:49.328 | took 4 ms | statement - connection 2
+ | 2024-05-07 13:31:49.638 | took 7 ms | commit - connection 2
+insert into products (categories_id,description,images,name,status) values (3,'Maggie Women''s High Low Dress Go for a different look by getting this white and blue colored knee length high low dress that comes from the hub of Maggie. This awesome dress with the combination of beautiful colors features round neck, solid pattern and excellent stitching. Intricately crafted from georgette fabric, this pretty piece is tough and able to withstand rigorous wear. With its sleeveless adornment, this beauty number will flaunt your curvaceous figure. Get ready to flaunt off your rich fashion sense by teaming it up with a pair of high heels and matching accessories while heading out. Go for a different look by getting this white and blue colored knee length high low dress that comes from the hub of Maggie. This awesome dress with the combination of beautiful colors features round neck, solid pattern and excellent stitching. Intricately crafted from georgette fabric, this pretty piece is tough and able to withstand rigorous wear. With its sleeveless adornment, this beauty number will flaunt your curvaceous figure. Get ready to flaunt off your rich fashion sense by teaming it up with a pair of high heels and matching accessories while heading out.','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A6578700000000177040000000174005E687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F64726573732F632F682F742F312D312D6D673233332D6D61676769652D33382D6F726967696E616C2D696D61656363616E7A7A3479687677672E6A70656778','Maggie Women''s High Low Dress','ENABLED') | 2024-05-07 13:31:50.47 | took 16 ms | statement - connection 2
+ | 2024-05-07 13:31:51.922 | took 1014 ms | commit - connection 2
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 13:33:54.468 | took 33 ms | statement - connection 3
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 13:33:54.500 | took 11 ms | statement - connection 3
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 13:33:54.515 | took 12 ms | statement - connection 3
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 13:33:54.531 | took 8 ms | statement - connection 3
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 13:33:54.531 | took 3 ms | statement - connection 3
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 13:33:54.609 | took 3 ms | statement - connection 3
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 13:33:54.625 | took 11 ms | statement - connection 3
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 13:33:54.640 | took 17 ms | statement - connection 3
+ | 2024-05-07 13:33:54.687 | took 4 ms | commit - connection 3
+insert into variants (categories_id,name) values (2,'Size') | 2024-05-07 13:33:54.750 | took 26 ms | statement - connection 3
+ | 2024-05-07 13:33:54.922 | took 163 ms | commit - connection 3
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 13:34:18.94 | took 5 ms | statement - connection 4
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 13:34:18.94 | took 2 ms | statement - connection 4
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 13:34:18.116 | took 8 ms | statement - connection 4
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 13:34:18.144 | took 18 ms | statement - connection 4
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 13:34:18.160 | took 5 ms | statement - connection 4
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 13:34:18.160 | took 2 ms | statement - connection 4
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 13:34:18.226 | took 47 ms | statement - connection 4
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 13:34:18.226 | took 2 ms | statement - connection 4
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 13:34:18.244 | took 6 ms | statement - connection 4
+ | 2024-05-07 13:34:18.244 | took 2 ms | commit - connection 4
+insert into variants (categories_id,name) values (2,'Color') | 2024-05-07 13:34:18.260 | took 2 ms | statement - connection 4
+ | 2024-05-07 13:34:18.410 | took 125 ms | commit - connection 4
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 13:34:34.313 | took 4 ms | statement - connection 5
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 13:34:34.329 | took 2 ms | statement - connection 5
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 13:34:34.364 | took 9 ms | statement - connection 5
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 13:34:34.366 | took 2 ms | statement - connection 5
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 13:34:34.382 | took 3 ms | statement - connection 5
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 13:34:34.398 | took 12 ms | statement - connection 5
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 13:34:34.413 | took 7 ms | statement - connection 5
+ | 2024-05-07 13:34:34.453 | took 4 ms | commit - connection 5
+insert into variants (categories_id,name) values (3,'Size') | 2024-05-07 13:34:34.561 | took 69 ms | statement - connection 5
+ | 2024-05-07 13:34:34.729 | took 64 ms | rollback - connection 5
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 13:35:07.492 | took 3 ms | statement - connection 6
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 13:35:07.512 | took 4 ms | statement - connection 6
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 13:35:07.526 | took 6 ms | statement - connection 6
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 13:35:07.541 | took 7 ms | statement - connection 6
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 13:35:07.541 | took 3 ms | statement - connection 6
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 13:35:07.558 | took 2 ms | statement - connection 6
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 13:35:07.575 | took 7 ms | statement - connection 6
+ | 2024-05-07 13:35:07.575 | took 1 ms | commit - connection 6
+insert into variants (categories_id,name) values (3,'Size') | 2024-05-07 13:35:07.591 | took 3 ms | statement - connection 6
+ | 2024-05-07 13:35:07.692 | took 73 ms | rollback - connection 6
+select ve1_0.id,ve1_0.categories_id,ve1_0.name from variants ve1_0 | 2024-05-07 13:35:13.175 | took 2 ms | statement - connection 7
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 13:35:13.190 | took 2 ms | statement - connection 7
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 13:35:13.206 | took 5 ms | statement - connection 7
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 13:35:13.206 | took 2 ms | statement - connection 7
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 13:35:13.222 | took 7 ms | statement - connection 7
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 13:35:13.222 | took 2 ms | statement - connection 7
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 13:35:13.260 | took 2 ms | statement - connection 7
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 13:35:13.260 | took 2 ms | statement - connection 7
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 13:35:13.276 | took 2 ms | statement - connection 7
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 13:35:13.276 | took 2 ms | statement - connection 7
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 13:35:13.292 | took 2 ms | statement - connection 7
+ | 2024-05-07 13:35:13.292 | took 1 ms | commit - connection 7
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 13:36:02.952 | took 2 ms | statement - connection 8
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 13:36:02.968 | took 8 ms | statement - connection 8
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 13:36:02.984 | took 4 ms | statement - connection 8
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 13:36:03.02 | took 3 ms | statement - connection 8
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 13:36:03.12 | took 9 ms | statement - connection 8
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 13:36:03.43 | took 9 ms | statement - connection 8
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 13:36:03.58 | took 9 ms | statement - connection 8
+ | 2024-05-07 13:36:03.74 | took 1 ms | commit - connection 8
+insert into variants (categories_id,name) values (3,'Color') | 2024-05-07 13:36:03.121 | took 24 ms | statement - connection 8
+ | 2024-05-07 13:36:03.388 | took 197 ms | rollback - connection 8
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 | 2024-05-07 13:36:21.923 | took 3 ms | statement - connection 9
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 13:36:21.939 | took 2 ms | statement - connection 9
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 13:36:21.957 | took 6 ms | statement - connection 9
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 13:36:21.957 | took 2 ms | statement - connection 9
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 13:36:21.972 | took 3 ms | statement - connection 9
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 13:36:21.991 | took 7 ms | statement - connection 9
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 13:36:21.991 | took 2 ms | statement - connection 9
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 13:36:22.05 | took 4 ms | statement - connection 9
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 13:36:22.07 | took 3 ms | statement - connection 9
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 13:36:22.21 | took 6 ms | statement - connection 9
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 13:36:22.21 | took 2 ms | statement - connection 9
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 13:36:22.38 | took 4 ms | statement - connection 9
+ | 2024-05-07 13:36:22.39 | took 2 ms | commit - connection 9
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 13:42:48.719 | took 11 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 13:42:48.781 | took 5 ms | statement - connection 1
+select * from `ecommerce`.`products_variants` where 1=0 | 2024-05-07 13:42:48.828 | took 4 ms | statement - connection 1
+select * from `ecommerce`.`variants_values` where 1=0 | 2024-05-07 13:42:48.844 | took 5 ms | statement - connection 1
+select * from `ecommerce`.`products` where 1=0 | 2024-05-07 13:42:48.891 | took 4 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 13:42:48.922 | took 2 ms | statement - connection 1
+select * from `ecommerce`.`variants` where 1=0 | 2024-05-07 13:42:48.953 | took 3 ms | statement - connection 1
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 13:43:32.861 | took 10 ms | statement - connection 2
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 13:43:33.48 | took 8 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 13:43:33.158 | took 3 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 13:43:33.189 | took 14 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 13:43:33.205 | took 11 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 13:43:33.283 | took 6 ms | statement - connection 2
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 13:43:33.283 | took 3 ms | statement - connection 2
+ | 2024-05-07 13:43:33.517 | took 9 ms | commit - connection 2
+insert into variants (categories_id,name) values (3,'Size') | 2024-05-07 13:43:33.979 | took 89 ms | statement - connection 2
+ | 2024-05-07 13:43:34.328 | took 48 ms | rollback - connection 2
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 13:44:45.407 | took 12 ms | statement - connection 3
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 13:44:45.429 | took 2 ms | statement - connection 3
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 13:44:45.445 | took 5 ms | statement - connection 3
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 13:44:45.456 | took 3 ms | statement - connection 3
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 13:44:45.469 | took 3 ms | statement - connection 3
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 13:44:45.486 | took 8 ms | statement - connection 3
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 13:44:45.494 | took 4 ms | statement - connection 3
+ | 2024-05-07 13:44:45.505 | took 2 ms | commit - connection 3
+insert into variants (categories_id,name) values (3,'Size') | 2024-05-07 13:44:45.570 | took 43 ms | statement - connection 3
+ | 2024-05-07 13:44:45.634 | took 45 ms | rollback - connection 3
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 13:54:34.153 | took 148 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 13:54:34.365 | took 9 ms | statement - connection 1
+select * from `ecommerce`.`products_variants` where 1=0 | 2024-05-07 13:54:34.509 | took 76 ms | statement - connection 1
+select * from `ecommerce`.`variants_values` where 1=0 | 2024-05-07 13:54:34.555 | took 26 ms | statement - connection 1
+select * from `ecommerce`.`products` where 1=0 | 2024-05-07 13:54:34.651 | took 4 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 13:54:34.706 | took 4 ms | statement - connection 1
+select * from `ecommerce`.`variants` where 1=0 | 2024-05-07 13:54:34.840 | took 52 ms | statement - connection 1
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 13:56:13.605 | took 58 ms | statement - connection 2
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 13:56:14.430 | took 2 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 13:56:14.658 | took 117 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 13:56:14.694 | took 14 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 13:56:14.713 | took 15 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 13:56:14.929 | took 3 ms | statement - connection 2
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 13:56:14.976 | took 33 ms | statement - connection 2
+ | 2024-05-07 13:56:15.374 | took 80 ms | commit - connection 2
+insert into variants (categories_id,name) values (3,'Size') | 2024-05-07 13:56:16.581 | took 888 ms | statement - connection 2
+ | 2024-05-07 13:56:17.432 | took 451 ms | rollback - connection 2
+select ve1_0.id,ve1_0.categories_id,ve1_0.name from variants ve1_0 | 2024-05-07 13:57:58.710 | took 17 ms | statement - connection 3
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 13:57:58.827 | took 15 ms | statement - connection 3
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 13:57:58.852 | took 3 ms | statement - connection 3
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 13:57:58.873 | took 14 ms | statement - connection 3
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 13:57:58.891 | took 3 ms | statement - connection 3
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 13:57:58.907 | took 4 ms | statement - connection 3
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 13:57:58.957 | took 22 ms | statement - connection 3
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 13:57:59.170 | took 195 ms | statement - connection 3
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 13:57:59.194 | took 17 ms | statement - connection 3
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 13:57:59.237 | took 31 ms | statement - connection 3
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 13:57:59.289 | took 44 ms | statement - connection 3
+ | 2024-05-07 13:57:59.323 | took 5 ms | commit - connection 3
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 14:15:11.980 | took 170 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 14:15:12.109 | took 11 ms | statement - connection 1
+select * from `ecommerce`.`products_variants` where 1=0 | 2024-05-07 14:15:12.425 | took 265 ms | statement - connection 1
+select * from `ecommerce`.`variants_values` where 1=0 | 2024-05-07 14:15:12.525 | took 76 ms | statement - connection 1
+select * from `ecommerce`.`products` where 1=0 | 2024-05-07 14:15:12.661 | took 101 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 14:15:12.712 | took 2 ms | statement - connection 1
+select * from `ecommerce`.`variants` where 1=0 | 2024-05-07 14:15:12.795 | took 17 ms | statement - connection 1
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 14:16:41.570 | took 30 ms | statement - connection 2
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 14:16:41.975 | took 3 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 14:16:42.131 | took 71 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 14:16:42.147 | took 4 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 14:16:42.178 | took 13 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 14:16:42.327 | took 2 ms | statement - connection 2
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 14:16:42.343 | took 8 ms | statement - connection 2
+ | 2024-05-07 14:16:42.640 | took 28 ms | commit - connection 2
+insert into variants (categories_id,name) values (3,'Size') | 2024-05-07 14:16:43.108 | took 291 ms | statement - connection 2
+ | 2024-05-07 14:16:45.392 | took 1701 ms | rollback - connection 2
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 14:32:11.873 | took 107 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 14:32:11.974 | took 4 ms | statement - connection 1
+select * from `ecommerce`.`products_variants` where 1=0 | 2024-05-07 14:32:12.252 | took 209 ms | statement - connection 1
+select * from `ecommerce`.`variants_values` where 1=0 | 2024-05-07 14:32:12.444 | took 106 ms | statement - connection 1
+select * from `ecommerce`.`products` where 1=0 | 2024-05-07 14:32:12.752 | took 212 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 14:32:12.853 | took 3 ms | statement - connection 1
+select * from `ecommerce`.`variants` where 1=0 | 2024-05-07 14:32:13.03 | took 65 ms | statement - connection 1
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 14:33:58.126 | took 148 ms | statement - connection 2
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 14:33:58.516 | took 3 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 14:33:58.704 | took 57 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 14:33:58.766 | took 52 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 14:33:58.798 | took 6 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 14:33:58.954 | took 3 ms | statement - connection 2
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 14:33:59.32 | took 68 ms | statement - connection 2
+ | 2024-05-07 14:34:00.425 | took 228 ms | commit - connection 2
+insert into variants (categories_id,name) values (3,'Size') | 2024-05-07 14:34:05.496 | took 4367 ms | statement - connection 2
+ | 2024-05-07 14:34:06.688 | took 72 ms | rollback - connection 2
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 14:49:41.594 | took 95 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 14:49:41.700 | took 3 ms | statement - connection 1
+select * from `ecommerce`.`products_variants` where 1=0 | 2024-05-07 14:49:42.142 | took 395 ms | statement - connection 1
+select * from `ecommerce`.`variants_values` where 1=0 | 2024-05-07 14:49:42.229 | took 67 ms | statement - connection 1
+select * from `ecommerce`.`products` where 1=0 | 2024-05-07 14:49:42.708 | took 350 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 14:49:42.782 | took 3 ms | statement - connection 1
+select * from `ecommerce`.`variants` where 1=0 | 2024-05-07 14:49:42.826 | took 2 ms | statement - connection 1
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 14:51:30.21 | took 84 ms | statement - connection 2
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 14:51:30.308 | took 2 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 14:51:30.448 | took 66 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 14:51:30.495 | took 25 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 14:51:30.511 | took 7 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 14:51:30.620 | took 3 ms | statement - connection 2
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 14:51:30.636 | took 7 ms | statement - connection 2
+ | 2024-05-07 14:51:30.889 | took 47 ms | commit - connection 2
+insert into variants (categories_id,name) values (3,'Size') | 2024-05-07 14:51:31.868 | took 718 ms | statement - connection 2
+ | 2024-05-07 14:51:32.132 | took 71 ms | rollback - connection 2
+select ve1_0.id,ve1_0.categories_id,ve1_0.name from variants ve1_0 | 2024-05-07 14:58:51.854 | took 3 ms | statement - connection 3
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 14:58:51.870 | took 2 ms | statement - connection 3
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 14:58:51.886 | took 3 ms | statement - connection 3
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 14:58:51.901 | took 7 ms | statement - connection 3
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 14:58:51.901 | took 2 ms | statement - connection 3
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 14:58:51.917 | took 7 ms | statement - connection 3
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 14:58:51.948 | took 2 ms | statement - connection 3
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 14:58:52.107 | took 134 ms | statement - connection 3
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 14:58:52.114 | took 2 ms | statement - connection 3
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 14:58:52.125 | took 9 ms | statement - connection 3
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 14:58:52.125 | took 3 ms | statement - connection 3
+ | 2024-05-07 14:58:52.140 | took 1 ms | commit - connection 3
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 | 2024-05-07 14:59:25.762 | took 53 ms | statement - connection 4
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 14:59:25.954 | took 8 ms | statement - connection 4
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 14:59:25.987 | took 22 ms | statement - connection 4
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 14:59:26.11 | took 15 ms | statement - connection 4
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 14:59:26.58 | took 14 ms | statement - connection 4
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 14:59:26.91 | took 19 ms | statement - connection 4
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 14:59:26.163 | took 2 ms | statement - connection 4
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 14:59:26.176 | took 3 ms | statement - connection 4
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 14:59:26.183 | took 2 ms | statement - connection 4
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 14:59:26.185 | took 5 ms | statement - connection 4
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 14:59:26.200 | took 4 ms | statement - connection 4
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 14:59:26.216 | took 7 ms | statement - connection 4
+ | 2024-05-07 14:59:26.259 | took 16 ms | commit - connection 4
+create table products_details (products_variants_id bigint not null, variants_values_id bigint not null, primary key (products_variants_id, variants_values_id)) engine=InnoDB | 2024-05-07 17:35:21.578 | took 3857 ms | statement - connection 1
+create table variants (id bigint not null auto_increment, name varchar(255) not null, categories_id bigint not null, primary key (id)) engine=InnoDB | 2024-05-07 17:35:22.640 | took 1019 ms | statement - connection 1
+create table variants_values (id bigint not null auto_increment, value varchar(255) not null, variants_id bigint not null, primary key (id)) engine=InnoDB | 2024-05-07 17:35:23.828 | took 1185 ms | statement - connection 1
+alter table variants_values drop index UK_km6xjdsloh63f5yjrdt8b530u | 2024-05-07 17:35:24.187 | took 333 ms | statement - connection 1
+alter table variants_values add constraint UK_km6xjdsloh63f5yjrdt8b530u unique (value) | 2024-05-07 17:35:25.500 | took 1310 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 17:35:26.15 | took 67 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 17:35:26.62 | took 4 ms | statement - connection 1
+alter table products_details add constraint FKljkat9b16ng238n38jqb09xf2 foreign key (variants_values_id) references variants_values (id) | 2024-05-07 17:35:29.378 | took 3310 ms | statement - connection 1
+alter table products_details add constraint FKpssy3w4luukeyewgsm7fysmo8 foreign key (products_variants_id) references products_variants (id) | 2024-05-07 17:35:31.644 | took 2258 ms | statement - connection 1
+select * from `ecommerce`.`products` where 1=0 | 2024-05-07 17:35:31.753 | took 51 ms | statement - connection 1
+alter table variants add constraint FKad6us22s38v900ew0emhka5kk foreign key (categories_id) references categories (id) | 2024-05-07 17:35:34.753 | took 2995 ms | statement - connection 1
+alter table variants_values add constraint FKb5s8s62f77ddl5iq8u2qxx72e foreign key (variants_id) references variants (id) | 2024-05-07 17:35:37.835 | took 3083 ms | statement - connection 1
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 17:36:21.107 | took 19 ms | statement - connection 2
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 17:36:21.373 | took 9 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 17:36:21.514 | took 41 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 17:36:21.529 | took 11 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 17:36:21.545 | took 3 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 17:36:21.686 | took 4 ms | statement - connection 2
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 17:36:21.717 | took 15 ms | statement - connection 2
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 17:36:21.748 | took 5 ms | statement - connection 2
+ | 2024-05-07 17:36:21.943 | took 2 ms | commit - connection 2
+insert into variants (categories_id,name) values (2,'Size') | 2024-05-07 17:36:22.240 | took 94 ms | statement - connection 2
+ | 2024-05-07 17:36:22.474 | took 96 ms | commit - connection 2
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 17:36:36.41 | took 3 ms | statement - connection 3
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 17:36:36.57 | took 3 ms | statement - connection 3
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 17:36:36.72 | took 13 ms | statement - connection 3
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 17:36:36.88 | took 3 ms | statement - connection 3
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 17:36:36.128 | took 13 ms | statement - connection 3
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 17:36:36.159 | took 13 ms | statement - connection 3
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 17:36:36.191 | took 7 ms | statement - connection 3
+ | 2024-05-07 17:36:36.206 | took 16 ms | commit - connection 3
+insert into variants (categories_id,name) values (3,'Color') | 2024-05-07 17:36:36.301 | took 25 ms | statement - connection 3
+ | 2024-05-07 17:36:36.461 | took 145 ms | commit - connection 3
+select ve1_0.id,ve1_0.categories_id,ve1_0.name from variants ve1_0 | 2024-05-07 17:37:05.964 | took 9 ms | statement - connection 4
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 17:37:05.995 | took 5 ms | statement - connection 4
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 17:37:06.11 | took 2 ms | statement - connection 4
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 17:37:06.11 | took 3 ms | statement - connection 4
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 17:37:06.27 | took 2 ms | statement - connection 4
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 17:37:06.42 | took 12 ms | statement - connection 4
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 17:37:06.73 | took 4 ms | statement - connection 4
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 17:37:06.89 | took 3 ms | statement - connection 4
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 17:37:06.105 | took 9 ms | statement - connection 4
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 17:37:06.120 | took 8 ms | statement - connection 4
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 17:37:06.120 | took 2 ms | statement - connection 4
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 17:37:06.136 | took 2 ms | statement - connection 4
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 17:37:06.151 | took 10 ms | statement - connection 4
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 17:37:06.167 | took 6 ms | statement - connection 4
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 17:37:06.183 | took 5 ms | statement - connection 4
+ | 2024-05-07 17:37:06.198 | took 1 ms | commit - connection 4
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 17:37:18.752 | took 12 ms | statement - connection 5
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 17:37:18.768 | took 3 ms | statement - connection 5
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 17:37:18.784 | took 3 ms | statement - connection 5
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 17:37:18.784 | took 3 ms | statement - connection 5
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 17:37:18.799 | took 6 ms | statement - connection 5
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 17:37:18.815 | took 5 ms | statement - connection 5
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 17:37:18.830 | took 4 ms | statement - connection 5
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 17:37:18.846 | took 4 ms | statement - connection 5
+ | 2024-05-07 17:37:18.862 | took 1 ms | commit - connection 5
+insert into variants (categories_id,name) values (3,'Size') | 2024-05-07 17:37:18.877 | took 9 ms | statement - connection 5
+ | 2024-05-07 17:37:18.973 | took 88 ms | commit - connection 5
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 17:37:26.489 | took 8 ms | statement - connection 6
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 17:37:26.490 | took 3 ms | statement - connection 6
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 17:37:26.506 | took 5 ms | statement - connection 6
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 17:37:26.521 | took 3 ms | statement - connection 6
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 17:37:26.537 | took 3 ms | statement - connection 6
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 17:37:26.553 | took 4 ms | statement - connection 6
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 17:37:26.584 | took 3 ms | statement - connection 6
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=3 | 2024-05-07 17:37:26.584 | took 2 ms | statement - connection 6
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 17:37:26.599 | took 10 ms | statement - connection 6
+ | 2024-05-07 17:37:26.631 | took 1 ms | commit - connection 6
+insert into variants (categories_id,name) values (3,'Color') | 2024-05-07 17:37:26.681 | took 11 ms | statement - connection 6
+ | 2024-05-07 17:37:26.899 | took 189 ms | commit - connection 6
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 | 2024-05-07 17:37:31.101 | took 16 ms | statement - connection 7
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 17:37:31.137 | took 13 ms | statement - connection 7
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 17:37:31.171 | took 15 ms | statement - connection 7
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 17:37:31.187 | took 16 ms | statement - connection 7
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 17:37:31.303 | took 13 ms | statement - connection 7
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 17:37:31.355 | took 34 ms | statement - connection 7
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 17:37:31.386 | took 14 ms | statement - connection 7
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 17:37:31.891 | took 486 ms | statement - connection 7
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 17:37:31.907 | took 3 ms | statement - connection 7
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 17:37:31.942 | took 15 ms | statement - connection 7
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=4 | 2024-05-07 17:37:31.974 | took 13 ms | statement - connection 7
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 17:37:32.59 | took 15 ms | statement - connection 7
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=3 | 2024-05-07 17:37:32.73 | took 3 ms | statement - connection 7
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 17:37:32.73 | took 5 ms | statement - connection 7
+ | 2024-05-07 17:37:32.89 | took 4 ms | commit - connection 7
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 17:40:16.617 | took 3 ms | statement - connection 8
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 17:40:16.617 | took 7 ms | statement - connection 8
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 17:40:16.649 | took 11 ms | statement - connection 8
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 17:40:16.680 | took 9 ms | statement - connection 8
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 17:40:16.680 | took 3 ms | statement - connection 8
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 17:40:16.711 | took 2 ms | statement - connection 8
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 17:40:16.727 | took 2 ms | statement - connection 8
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 17:40:16.742 | took 3 ms | statement - connection 8
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 17:40:16.774 | took 2 ms | statement - connection 8
+ | 2024-05-07 17:40:16.914 | took 48 ms | commit - connection 8
+select ve1_0.id,ve1_0.categories_id,ve1_0.name from variants ve1_0 where ve1_0.id=2 | 2024-05-07 17:40:16.937 | took 2 ms | statement - connection 8
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 17:40:16.997 | took 2 ms | statement - connection 8
+update variants set categories_id=2,name='Color' where id=2 | 2024-05-07 17:40:17.216 | took 48 ms | statement - connection 8
+ | 2024-05-07 17:40:17.435 | took 212 ms | commit - connection 8
+select ve1_0.id,ve1_0.categories_id,ve1_0.name from variants ve1_0 | 2024-05-07 17:40:25.315 | took 4 ms | statement - connection 9
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 17:40:25.334 | took 8 ms | statement - connection 9
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 17:40:25.347 | took 4 ms | statement - connection 9
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 17:40:25.365 | took 4 ms | statement - connection 9
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 17:40:25.395 | took 3 ms | statement - connection 9
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 17:40:25.412 | took 3 ms | statement - connection 9
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 17:40:25.431 | took 2 ms | statement - connection 9
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 17:40:25.447 | took 3 ms | statement - connection 9
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 17:40:25.469 | took 9 ms | statement - connection 9
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 17:40:25.483 | took 2 ms | statement - connection 9
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 17:40:25.494 | took 7 ms | statement - connection 9
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 17:40:25.506 | took 5 ms | statement - connection 9
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 17:40:25.519 | took 3 ms | statement - connection 9
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 17:40:25.530 | took 6 ms | statement - connection 9
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=4 | 2024-05-07 17:40:25.544 | took 12 ms | statement - connection 9
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=3 | 2024-05-07 17:40:25.544 | took 3 ms | statement - connection 9
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 17:40:25.561 | took 3 ms | statement - connection 9
+ | 2024-05-07 17:40:25.578 | took 4 ms | commit - connection 9
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 | 2024-05-07 17:40:41.85 | took 6 ms | statement - connection 10
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 17:40:41.110 | took 4 ms | statement - connection 10
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 17:40:41.110 | took 2 ms | statement - connection 10
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 17:40:41.127 | took 7 ms | statement - connection 10
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 17:40:41.164 | took 3 ms | statement - connection 10
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 17:40:41.212 | took 13 ms | statement - connection 10
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 17:40:41.234 | took 3 ms | statement - connection 10
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 17:40:41.260 | took 3 ms | statement - connection 10
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 17:40:41.276 | took 2 ms | statement - connection 10
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 17:40:41.311 | took 6 ms | statement - connection 10
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 17:40:41.311 | took 3 ms | statement - connection 10
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=4 | 2024-05-07 17:40:41.332 | took 8 ms | statement - connection 10
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=3 | 2024-05-07 17:40:41.344 | took 4 ms | statement - connection 10
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 17:40:41.360 | took 2 ms | statement - connection 10
+ | 2024-05-07 17:40:41.361 | took 3 ms | commit - connection 10
+select ve1_0.id,ve1_0.categories_id,ve1_0.name from variants ve1_0 | 2024-05-07 17:45:01.916 | took 2 ms | statement - connection 11
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 17:45:01.989 | took 24 ms | statement - connection 11
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 17:45:01.999 | took 2 ms | statement - connection 11
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 17:45:02.15 | took 2 ms | statement - connection 11
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 17:45:02.31 | took 3 ms | statement - connection 11
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 17:45:02.51 | took 6 ms | statement - connection 11
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 17:45:02.66 | took 5 ms | statement - connection 11
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 17:45:02.81 | took 5 ms | statement - connection 11
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 17:45:02.98 | took 11 ms | statement - connection 11
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 17:45:02.107 | took 5 ms | statement - connection 11
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 17:45:02.121 | took 3 ms | statement - connection 11
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 17:45:02.149 | took 17 ms | statement - connection 11
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 17:45:02.173 | took 18 ms | statement - connection 11
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 17:45:02.232 | took 37 ms | statement - connection 11
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=4 | 2024-05-07 17:45:02.273 | took 13 ms | statement - connection 11
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=3 | 2024-05-07 17:45:02.367 | took 40 ms | statement - connection 11
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 17:45:02.387 | took 5 ms | statement - connection 11
+ | 2024-05-07 17:45:02.400 | took 5 ms | commit - connection 11
+select ve1_0.id,ve1_0.categories_id,ve1_0.name from variants ve1_0 where ve1_0.id=2 | 2024-05-07 17:45:16.11 | took 2 ms | statement - connection 12
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 17:45:16.42 | took 3 ms | statement - connection 12
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 17:45:16.204 | took 3 ms | statement - connection 12
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 17:45:16.238 | took 16 ms | statement - connection 12
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 17:45:16.253 | took 2 ms | statement - connection 12
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 17:45:16.269 | took 4 ms | statement - connection 12
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 17:45:16.285 | took 3 ms | statement - connection 12
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 17:45:16.310 | took 8 ms | statement - connection 12
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 17:45:16.319 | took 9 ms | statement - connection 12
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 17:45:16.342 | took 11 ms | statement - connection 12
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 17:45:16.342 | took 3 ms | statement - connection 12
+ | 2024-05-07 17:45:16.389 | took 1 ms | commit - connection 12
+insert into variants_values (value,variants_id) values ('Red',2) | 2024-05-07 17:45:16.447 | took 34 ms | statement - connection 12
+ | 2024-05-07 17:45:16.784 | took 314 ms | commit - connection 12
+select ve1_0.id,ve1_0.categories_id,ve1_0.name from variants ve1_0 where ve1_0.id=2 | 2024-05-07 17:45:24.902 | took 4 ms | statement - connection 13
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 17:45:24.914 | took 8 ms | statement - connection 13
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 17:45:24.914 | took 2 ms | statement - connection 13
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 17:45:24.931 | took 3 ms | statement - connection 13
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 17:45:24.931 | took 2 ms | statement - connection 13
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 17:45:24.951 | took 3 ms | statement - connection 13
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 17:45:24.963 | took 6 ms | statement - connection 13
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 17:45:24.963 | took 2 ms | statement - connection 13
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 17:45:24.981 | took 5 ms | statement - connection 13
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=1 | 2024-05-07 17:45:25.29 | took 50 ms | statement - connection 13
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 17:45:25.29 | took 2 ms | statement - connection 13
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 17:45:25.49 | took 8 ms | statement - connection 13
+ | 2024-05-07 17:45:25.64 | took 3 ms | commit - connection 13
+insert into variants_values (value,variants_id) values ('Green',2) | 2024-05-07 17:45:25.96 | took 31 ms | statement - connection 13
+ | 2024-05-07 17:45:25.336 | took 221 ms | commit - connection 13
+select ve1_0.id,ve1_0.categories_id,ve1_0.name from variants ve1_0 where ve1_0.id=2 | 2024-05-07 17:45:30.504 | took 9 ms | statement - connection 14
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 17:45:30.504 | took 4 ms | statement - connection 14
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 17:45:30.519 | took 4 ms | statement - connection 14
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 17:45:30.550 | took 13 ms | statement - connection 14
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 17:45:30.566 | took 10 ms | statement - connection 14
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 17:45:30.597 | took 22 ms | statement - connection 14
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 17:45:30.597 | took 3 ms | statement - connection 14
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 17:45:30.613 | took 2 ms | statement - connection 14
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 17:45:30.629 | took 13 ms | statement - connection 14
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=1 | 2024-05-07 17:45:30.675 | took 8 ms | statement - connection 14
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=2 | 2024-05-07 17:45:30.675 | took 3 ms | statement - connection 14
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 17:45:30.691 | took 10 ms | statement - connection 14
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 17:45:30.707 | took 12 ms | statement - connection 14
+ | 2024-05-07 17:45:30.824 | took 16 ms | commit - connection 14
+insert into variants_values (value,variants_id) values ('Blue',2) | 2024-05-07 17:45:31.95 | took 65 ms | statement - connection 14
+ | 2024-05-07 17:45:31.282 | took 159 ms | commit - connection 14
+select pe1_0.id,pe1_0.categories_id,pe1_0.description,pe1_0.images,pe1_0.name,pe1_0.status from products pe1_0 where pe1_0.id=1 | 2024-05-07 17:48:52.277 | took 3 ms | statement - connection 15
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 17:48:52.309 | took 11 ms | statement - connection 15
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 17:48:52.309 | took 3 ms | statement - connection 15
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 17:48:52.324 | took 5 ms | statement - connection 15
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 17:48:52.344 | took 17 ms | statement - connection 15
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 17:48:52.481 | took 4 ms | statement - connection 15
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 17:48:52.514 | took 8 ms | statement - connection 15
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 17:48:52.545 | took 15 ms | statement - connection 15
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 17:48:52.561 | took 14 ms | statement - connection 15
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=1 | 2024-05-07 17:48:52.576 | took 3 ms | statement - connection 15
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=2 | 2024-05-07 17:48:52.613 | took 3 ms | statement - connection 15
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=3 | 2024-05-07 17:48:52.626 | took 3 ms | statement - connection 15
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 17:48:52.632 | took 3 ms | statement - connection 15
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 17:48:52.644 | took 4 ms | statement - connection 15
+ | 2024-05-07 17:48:52.648 | took 1 ms | commit - connection 15
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 17:55:05.230 | took 336 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 17:55:05.425 | took 3 ms | statement - connection 1
+select * from `ecommerce`.`products_variants` where 1=0 | 2024-05-07 17:55:05.734 | took 96 ms | statement - connection 1
+select * from `ecommerce`.`variants_values` where 1=0 | 2024-05-07 17:55:06.02 | took 225 ms | statement - connection 1
+select * from `ecommerce`.`products` where 1=0 | 2024-05-07 17:55:06.829 | took 761 ms | statement - connection 1
+select * from `ecommerce`.`categories` where 1=0 | 2024-05-07 17:55:06.867 | took 2 ms | statement - connection 1
+select * from `ecommerce`.`variants` where 1=0 | 2024-05-07 17:55:06.908 | took 5 ms | statement - connection 1
+select pe1_0.id,pe1_0.categories_id,pe1_0.description,pe1_0.images,pe1_0.name,pe1_0.status from products pe1_0 where pe1_0.id=1 | 2024-05-07 17:56:20.640 | took 11 ms | statement - connection 2
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 17:56:21.912 | took 3 ms | statement - connection 2
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 17:56:22.10 | took 28 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 17:56:22.328 | took 84 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 17:56:22.363 | took 4 ms | statement - connection 2
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 17:56:22.378 | took 3 ms | statement - connection 2
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 17:56:22.431 | took 4 ms | statement - connection 2
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 17:56:22.574 | took 10 ms | statement - connection 2
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 17:56:22.589 | took 9 ms | statement - connection 2
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=1 | 2024-05-07 17:56:22.657 | took 31 ms | statement - connection 2
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=2 | 2024-05-07 17:56:22.673 | took 3 ms | statement - connection 2
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=3 | 2024-05-07 17:56:22.724 | took 34 ms | statement - connection 2
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 17:56:22.744 | took 5 ms | statement - connection 2
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 17:56:22.771 | took 7 ms | statement - connection 2
+ | 2024-05-07 17:56:23.290 | took 8 ms | commit - connection 2
+insert into products_variants (description,images,price,products_id,sku,stock) values ('RGT Full Sleeve Striped Men''s Sweatshirt - Buy Multicolor RGT Full Sleeve Striped Men''s Sweatshirt For Only Rs. 1535 Online in India. Shop Online For Apparels. Huge Collection of Branded Clothes Only at Flipkart.com','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A65787000000005770400000005740062687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F737765617473686972742F762F732F392F72677436303332626C75652D7267742D786C2D6F726967696E616C2D696D616565796133347179667A6577782E6A706567740062687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F737765617473686972742F762F732F392F72677436303332626C75652D7267742D786C2D6F726967696E616C2D696D616565796133347179667A6577782E6A706567740063687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F737765617473686972742F362F322F622F72677436303332626C75652D7267742D78786C2D6F726967696E616C2D696D61656579613276647738717A75622E6A706567740062687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F737765617473686972742F762F732F392F72677436303332626C75652D7267742D786C2D6F726967696E616C2D696D6165657961327979743637706A7A2E6A706567740063687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F737765617473686972742F362F322F622F72677436303332626C75652D7267742D78786C2D6F726967696E616C2D696D61656579613368637776686562722E6A70656778',1535,1,'SWSEEF4TPX3GYVS9',1000) | 2024-05-07 17:56:24.476 | took 265 ms | statement - connection 2
+ | 2024-05-07 17:56:24.792 | took 2 ms | rollback - connection 2
+select pe1_0.id,pe1_0.categories_id,pe1_0.description,pe1_0.images,pe1_0.name,pe1_0.status from products pe1_0 where pe1_0.id=1 | 2024-05-07 18:00:50.601 | took 12 ms | statement - connection 3
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 18:00:50.708 | took 6 ms | statement - connection 3
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 18:00:50.717 | took 2 ms | statement - connection 3
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 18:00:50.959 | took 7 ms | statement - connection 3
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 18:00:50.959 | took 3 ms | statement - connection 3
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 18:00:50.974 | took 2 ms | statement - connection 3
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 18:00:50.990 | took 4 ms | statement - connection 3
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 18:00:50.990 | took 3 ms | statement - connection 3
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 18:00:51.05 | took 3 ms | statement - connection 3
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=1 | 2024-05-07 18:00:51.68 | took 34 ms | statement - connection 3
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=2 | 2024-05-07 18:00:51.68 | took 3 ms | statement - connection 3
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=3 | 2024-05-07 18:00:51.115 | took 30 ms | statement - connection 3
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 18:00:51.128 | took 6 ms | statement - connection 3
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 18:00:51.140 | took 7 ms | statement - connection 3
+ | 2024-05-07 18:00:51.161 | took 17 ms | commit - connection 3
+insert into products_variants (description,images,price,products_id,sku,stock) values ('RGT Full Sleeve Striped Men''s Sweatshirt - Buy Multicolor RGT Full Sleeve Striped Men''s Sweatshirt For Only Rs. 1535 Online in India. Shop Online For Apparels. Huge Collection of Branded Clothes Only at Flipkart.com','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A65787000000005770400000005740062687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F737765617473686972742F762F732F392F72677436303332626C75652D7267742D786C2D6F726967696E616C2D696D616565796133347179667A6577782E6A706567740062687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F737765617473686972742F762F732F392F72677436303332626C75652D7267742D786C2D6F726967696E616C2D696D616565796133347179667A6577782E6A706567740063687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F737765617473686972742F362F322F622F72677436303332626C75652D7267742D78786C2D6F726967696E616C2D696D61656579613276647738717A75622E6A706567740062687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F737765617473686972742F762F732F392F72677436303332626C75652D7267742D786C2D6F726967696E616C2D696D6165657961327979743637706A7A2E6A706567740063687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F737765617473686972742F362F322F622F72677436303332626C75652D7267742D78786C2D6F726967696E616C2D696D61656579613368637776686562722E6A70656778',1535,1,'SWSEEF4TPX3GYVS9',1000) | 2024-05-07 18:00:51.356 | took 47 ms | statement - connection 3
+insert into products_details (products_variants_id,variants_values_id) values (1,1) | 2024-05-07 18:00:51.707 | took 2 ms | statement - connection 3
+ | 2024-05-07 18:00:51.972 | took 198 ms | commit - connection 3
+select pe1_0.id,pe1_0.categories_id,pe1_0.description,pe1_0.images,pe1_0.name,pe1_0.status from products pe1_0 where pe1_0.id=1 | 2024-05-07 18:05:16.458 | took 3 ms | statement - connection 4
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 18:05:16.483 | took 3 ms | statement - connection 4
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 18:05:16.483 | took 4 ms | statement - connection 4
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 18:05:16.499 | took 2 ms | statement - connection 4
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 18:05:16.514 | took 8 ms | statement - connection 4
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 18:05:16.514 | took 2 ms | statement - connection 4
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 18:05:16.530 | took 3 ms | statement - connection 4
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 18:05:16.545 | took 6 ms | statement - connection 4
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 18:05:16.545 | took 2 ms | statement - connection 4
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=1 | 2024-05-07 18:05:16.561 | took 3 ms | statement - connection 4
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 18:05:16.577 | took 6 ms | statement - connection 4
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=1 | 2024-05-07 18:05:16.577 | took 3 ms | statement - connection 4
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=2 | 2024-05-07 18:05:16.592 | took 7 ms | statement - connection 4
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=3 | 2024-05-07 18:05:16.608 | took 2 ms | statement - connection 4
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 18:05:16.608 | took 2 ms | statement - connection 4
+ | 2024-05-07 18:05:16.624 | took 1 ms | commit - connection 4
+insert into products_variants (description,images,price,products_id,sku,stock) values ('Jovial Mart Store Men''s Solid Formal Shirt (Pack of 2) Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease. Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease.','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A65787000000006770400000006740065687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F73686972742F652F392F682F333030312D6A6F7669616C2D6D6172742D73746F72652D34322D3130303078313030302D696D61656377676D336A76756767656A2E6A706567740064687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F73686972742F652F392F682F333030312D6A6F7669616C2D6D6172742D73746F72652D34322D6F726967696E616C2D696D61656377676D336A76756767656A2E6A706567740064687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F73686972742F322F662F642F333131362D6A6F7669616C2D6D6172742D73746F72652D34322D6F726967696E616C2D696D6165616239323667756A7A7570372E6A706567740064687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F73686972742F7A2F792F672F333131342D6A6F7669616C2D6D6172742D73746F72652D33382D6F726967696E616C2D696D61656162393266706877767272612E6A706567740064687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F73686972742F6D2F792F762F333132362D6A6F7669616C2D6D6172742D73746F72652D34322D6F726967696E616C2D696D61656162366662676439686A79762E6A706567740064687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F73686972742F6D2F792F762F333132362D6A6F7669616C2D6D6172742D73746F72652D34302D6F726967696E616C2D696D6165616B35673873657A66676B792E6A70656778',1999,1,'SHTECX5DGAETNX3E',1000) | 2024-05-07 18:05:16.655 | took 4 ms | statement - connection 4
+ | 2024-05-07 18:05:16.715 | took 29 ms | rollback - connection 4
+select pe1_0.id,pe1_0.categories_id,pe1_0.description,pe1_0.images,pe1_0.name,pe1_0.status from products pe1_0 where pe1_0.id=1 | 2024-05-07 18:06:02.697 | took 10 ms | statement - connection 5
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 18:06:02.716 | took 5 ms | statement - connection 5
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 18:06:02.733 | took 3 ms | statement - connection 5
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 18:06:02.748 | took 2 ms | statement - connection 5
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 18:06:02.748 | took 2 ms | statement - connection 5
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 18:06:02.764 | took 7 ms | statement - connection 5
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 18:06:02.764 | took 3 ms | statement - connection 5
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 18:06:02.779 | took 2 ms | statement - connection 5
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 18:06:02.795 | took 9 ms | statement - connection 5
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=1 | 2024-05-07 18:06:02.826 | took 23 ms | statement - connection 5
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 18:06:02.826 | took 2 ms | statement - connection 5
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=1 | 2024-05-07 18:06:02.842 | took 6 ms | statement - connection 5
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=2 | 2024-05-07 18:06:02.858 | took 9 ms | statement - connection 5
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=3 | 2024-05-07 18:06:02.858 | took 2 ms | statement - connection 5
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 18:06:02.889 | took 12 ms | statement - connection 5
+ | 2024-05-07 18:06:02.920 | took 1 ms | commit - connection 5
+insert into products_variants (description,images,price,products_id,sku,stock) values ('Jovial Mart Store Men''s Solid Formal Shirt (Pack of 2) Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease. Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease.','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A65787000000006770400000006740065687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F73686972742F652F392F682F333030312D6A6F7669616C2D6D6172742D73746F72652D34322D3130303078313030302D696D61656377676D336A76756767656A2E6A706567740064687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F73686972742F652F392F682F333030312D6A6F7669616C2D6D6172742D73746F72652D34322D6F726967696E616C2D696D61656377676D336A76756767656A2E6A706567740064687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F73686972742F322F662F642F333131362D6A6F7669616C2D6D6172742D73746F72652D34322D6F726967696E616C2D696D6165616239323667756A7A7570372E6A706567740064687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F73686972742F7A2F792F672F333131342D6A6F7669616C2D6D6172742D73746F72652D33382D6F726967696E616C2D696D61656162393266706877767272612E6A706567740064687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F73686972742F6D2F792F762F333132362D6A6F7669616C2D6D6172742D73746F72652D34322D6F726967696E616C2D696D61656162366662676439686A79762E6A706567740064687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F73686972742F6D2F792F762F333132362D6A6F7669616C2D6D6172742D73746F72652D34302D6F726967696E616C2D696D6165616B35673873657A66676B792E6A70656778',1999,1,'SHTECX5DGAETNX3E',1000) | 2024-05-07 18:06:03.461 | took 27 ms | statement - connection 5
+insert into products_details (products_variants_id,variants_values_id) values (2,2) | 2024-05-07 18:06:03.524 | took 15 ms | statement - connection 5
+ | 2024-05-07 18:06:03.945 | took 412 ms | commit - connection 5
+select pve1_0.id,pve1_0.description,pve1_0.images,pve1_0.price,pve1_0.products_id,pve1_0.sku,pve1_0.stock from products_variants pve1_0 | 2024-05-07 18:07:06.775 | took 8 ms | statement - connection 6
+select pe1_0.id,pe1_0.categories_id,pe1_0.description,pe1_0.images,pe1_0.name,pe1_0.status from products pe1_0 where pe1_0.id=1 | 2024-05-07 18:07:06.807 | took 7 ms | statement - connection 6
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 18:07:06.822 | took 2 ms | statement - connection 6
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 18:07:06.838 | took 12 ms | statement - connection 6
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 18:07:06.854 | took 8 ms | statement - connection 6
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 18:07:06.854 | took 2 ms | statement - connection 6
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 18:07:06.869 | took 6 ms | statement - connection 6
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 18:07:06.885 | took 5 ms | statement - connection 6
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 18:07:06.885 | took 2 ms | statement - connection 6
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 18:07:06.900 | took 7 ms | statement - connection 6
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=1 | 2024-05-07 18:07:06.916 | took 10 ms | statement - connection 6
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 18:07:06.932 | took 2 ms | statement - connection 6
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=2 | 2024-05-07 18:07:06.947 | took 2 ms | statement - connection 6
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=2 | 2024-05-07 18:07:06.947 | took 6 ms | statement - connection 6
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=1 | 2024-05-07 18:07:06.963 | took 2 ms | statement - connection 6
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=3 | 2024-05-07 18:07:06.963 | took 7 ms | statement - connection 6
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 18:07:06.979 | took 3 ms | statement - connection 6
+ | 2024-05-07 18:07:06.979 | took 4 ms | commit - connection 6
+select pe1_0.id,pe1_0.categories_id,pe1_0.description,pe1_0.images,pe1_0.name,pe1_0.status from products pe1_0 | 2024-05-07 18:08:35.918 | took 21 ms | statement - connection 7
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 18:08:35.965 | took 2 ms | statement - connection 7
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 18:08:35.992 | took 9 ms | statement - connection 7
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 18:08:36.07 | took 7 ms | statement - connection 7
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 18:08:36.77 | took 63 ms | statement - connection 7
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 18:08:36.142 | took 60 ms | statement - connection 7
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 18:08:36.158 | took 9 ms | statement - connection 7
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 18:08:36.189 | took 9 ms | statement - connection 7
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 18:08:36.207 | took 12 ms | statement - connection 7
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=1 | 2024-05-07 18:08:36.228 | took 7 ms | statement - connection 7
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 18:08:36.353 | took 4 ms | statement - connection 7
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=2 | 2024-05-07 18:08:36.370 | took 3 ms | statement - connection 7
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=2 | 2024-05-07 18:08:36.387 | took 7 ms | statement - connection 7
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=1 | 2024-05-07 18:08:36.387 | took 2 ms | statement - connection 7
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=3 | 2024-05-07 18:08:36.409 | took 9 ms | statement - connection 7
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 18:08:36.420 | took 5 ms | statement - connection 7
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 18:08:36.443 | took 7 ms | statement - connection 7
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 18:08:36.458 | took 8 ms | statement - connection 7
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 18:08:36.470 | took 5 ms | statement - connection 7
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=4 | 2024-05-07 18:08:36.485 | took 6 ms | statement - connection 7
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=3 | 2024-05-07 18:08:36.491 | took 9 ms | statement - connection 7
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 18:08:36.504 | took 3 ms | statement - connection 7
+ | 2024-05-07 18:08:36.541 | took 1 ms | commit - connection 7
+select pe1_0.id,pe1_0.categories_id,pe1_0.description,pe1_0.images,pe1_0.name,pe1_0.status from products pe1_0 where pe1_0.id=2 | 2024-05-07 18:11:00.744 | took 6 ms | statement - connection 8
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 18:11:00.775 | took 3 ms | statement - connection 8
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 18:11:00.806 | took 22 ms | statement - connection 8
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 18:11:00.822 | took 13 ms | statement - connection 8
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 18:11:00.853 | took 12 ms | statement - connection 8
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 18:11:00.869 | took 12 ms | statement - connection 8
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 18:11:00.900 | took 12 ms | statement - connection 8
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 18:11:00.947 | took 23 ms | statement - connection 8
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 18:11:00.947 | took 3 ms | statement - connection 8
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=1 | 2024-05-07 18:11:00.962 | took 3 ms | statement - connection 8
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 18:11:00.978 | took 5 ms | statement - connection 8
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=2 | 2024-05-07 18:11:00.978 | took 2 ms | statement - connection 8
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=2 | 2024-05-07 18:11:00.994 | took 5 ms | statement - connection 8
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=1 | 2024-05-07 18:11:01.09 | took 13 ms | statement - connection 8
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=3 | 2024-05-07 18:11:01.25 | took 4 ms | statement - connection 8
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 18:11:01.25 | took 2 ms | statement - connection 8
+ | 2024-05-07 18:11:01.41 | took 2 ms | commit - connection 8
+update products_variants set description='Jovial Mart Store Men''s Solid Formal Shirt (Pack of 2) Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease. Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease.',images='ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A65787000000006770400000006740065687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F73686972742F652F392F682F333030312D6A6F7669616C2D6D6172742D73746F72652D34322D3130303078313030302D696D61656377676D336A76756767656A2E6A706567740064687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F73686972742F652F392F682F333030312D6A6F7669616C2D6D6172742D73746F72652D34322D6F726967696E616C2D696D61656377676D336A76756767656A2E6A706567740064687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F73686972742F322F662F642F333131362D6A6F7669616C2D6D6172742D73746F72652D34322D6F726967696E616C2D696D6165616239323667756A7A7570372E6A706567740064687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F73686972742F7A2F792F672F333131342D6A6F7669616C2D6D6172742D73746F72652D33382D6F726967696E616C2D696D61656162393266706877767272612E6A706567740064687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F73686972742F6D2F792F762F333132362D6A6F7669616C2D6D6172742D73746F72652D34322D6F726967696E616C2D696D61656162366662676439686A79762E6A706567740064687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F73686972742F6D2F792F762F333132362D6A6F7669616C2D6D6172742D73746F72652D34302D6F726967696E616C2D696D6165616B35673873657A66676B792E6A70656778',price=1999.00,products_id=2,sku='SHTECX5DGAETNX3E',stock=1000 where id=2 | 2024-05-07 18:11:01.228 | took 64 ms | statement - connection 8
+ | 2024-05-07 18:11:01.462 | took 221 ms | commit - connection 8
+select pe1_0.id,pe1_0.categories_id,pe1_0.description,pe1_0.images,pe1_0.name,pe1_0.status from products pe1_0 | 2024-05-07 18:11:06.997 | took 5 ms | statement - connection 9
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 18:11:07.16 | took 2 ms | statement - connection 9
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 18:11:07.31 | took 2 ms | statement - connection 9
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 18:11:07.47 | took 5 ms | statement - connection 9
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 18:11:07.53 | took 2 ms | statement - connection 9
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 18:11:07.68 | took 8 ms | statement - connection 9
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 18:11:07.68 | took 2 ms | statement - connection 9
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 18:11:07.95 | took 9 ms | statement - connection 9
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 18:11:07.100 | took 8 ms | statement - connection 9
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=1 | 2024-05-07 18:11:07.115 | took 3 ms | statement - connection 9
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 18:11:07.131 | took 7 ms | statement - connection 9
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=1 | 2024-05-07 18:11:07.131 | took 3 ms | statement - connection 9
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=2 | 2024-05-07 18:11:07.147 | took 4 ms | statement - connection 9
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 18:11:07.164 | took 3 ms | statement - connection 9
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=2 | 2024-05-07 18:11:07.181 | took 2 ms | statement - connection 9
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=3 | 2024-05-07 18:11:07.198 | took 6 ms | statement - connection 9
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=3 | 2024-05-07 18:11:07.214 | took 4 ms | statement - connection 9
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=3 | 2024-05-07 18:11:07.214 | took 3 ms | statement - connection 9
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=3 | 2024-05-07 18:11:07.231 | took 11 ms | statement - connection 9
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=4 | 2024-05-07 18:11:07.250 | took 3 ms | statement - connection 9
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=3 | 2024-05-07 18:11:07.264 | took 6 ms | statement - connection 9
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=3 | 2024-05-07 18:11:07.264 | took 3 ms | statement - connection 9
+ | 2024-05-07 18:11:07.283 | took 3 ms | commit - connection 9
+select pve1_0.id,pve1_0.description,pve1_0.images,pve1_0.price,pve1_0.products_id,pve1_0.sku,pve1_0.stock from products_variants pve1_0 | 2024-05-07 18:14:33.882 | took 2 ms | statement - connection 10
+select pe1_0.id,pe1_0.categories_id,pe1_0.description,pe1_0.images,pe1_0.name,pe1_0.status from products pe1_0 where pe1_0.id=1 | 2024-05-07 18:14:33.909 | took 3 ms | statement - connection 10
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 18:14:33.909 | took 2 ms | statement - connection 10
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 18:14:33.924 | took 2 ms | statement - connection 10
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 18:14:33.940 | took 2 ms | statement - connection 10
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 18:14:33.955 | took 9 ms | statement - connection 10
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 18:14:33.955 | took 2 ms | statement - connection 10
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 18:14:33.971 | took 2 ms | statement - connection 10
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 18:14:33.987 | took 7 ms | statement - connection 10
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 18:14:33.987 | took 5 ms | statement - connection 10
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=1 | 2024-05-07 18:14:34.02 | took 2 ms | statement - connection 10
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 18:14:34.18 | took 5 ms | statement - connection 10
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=1 | 2024-05-07 18:14:34.34 | took 11 ms | statement - connection 10
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=2 | 2024-05-07 18:14:34.49 | took 12 ms | statement - connection 10
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 18:14:34.65 | took 6 ms | statement - connection 10
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=2 | 2024-05-07 18:14:34.80 | took 3 ms | statement - connection 10
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=3 | 2024-05-07 18:14:34.80 | took 3 ms | statement - connection 10
+ | 2024-05-07 18:14:34.96 | took 1 ms | commit - connection 10
+select pe1_0.id,pe1_0.categories_id,pe1_0.description,pe1_0.images,pe1_0.name,pe1_0.status from products pe1_0 where pe1_0.id=2 | 2024-05-07 18:14:49.553 | took 3 ms | statement - connection 11
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 18:14:49.554 | took 2 ms | statement - connection 11
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 18:14:49.570 | took 7 ms | statement - connection 11
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 18:14:49.589 | took 9 ms | statement - connection 11
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 18:14:49.604 | took 2 ms | statement - connection 11
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 18:14:49.620 | took 3 ms | statement - connection 11
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 18:14:49.636 | took 3 ms | statement - connection 11
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 18:14:49.654 | took 10 ms | statement - connection 11
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 18:14:49.669 | took 2 ms | statement - connection 11
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=1 | 2024-05-07 18:14:49.674 | took 3 ms | statement - connection 11
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 18:14:49.687 | took 2 ms | statement - connection 11
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=1 | 2024-05-07 18:14:49.702 | took 3 ms | statement - connection 11
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=2 | 2024-05-07 18:14:49.708 | took 5 ms | statement - connection 11
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 18:14:49.720 | took 7 ms | statement - connection 11
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=2 | 2024-05-07 18:14:49.720 | took 2 ms | statement - connection 11
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=3 | 2024-05-07 18:14:49.735 | took 3 ms | statement - connection 11
+ | 2024-05-07 18:14:49.752 | took 7 ms | commit - connection 11
+insert into products_variants (description,images,price,products_id,sku,stock) values ('Jovial Mart Store Men''s Solid Formal Shirt (Pack of 2) Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease. Show Off Your Love For Smart Dressing As You Wear This Formal Shirt From The House Of Jovial Mart. Fashioned Using The Ultimate Material For Comfort- Cotton, This Shirt Will Keep You At Ease.','ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A65787000000006770400000006740065687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F73686972742F652F392F682F333030312D6A6F7669616C2D6D6172742D73746F72652D34322D3130303078313030302D696D61656377676D336A76756767656A2E6A706567740064687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F73686972742F652F392F682F333030312D6A6F7669616C2D6D6172742D73746F72652D34322D6F726967696E616C2D696D61656377676D336A76756767656A2E6A706567740064687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F73686972742F322F662F642F333131362D6A6F7669616C2D6D6172742D73746F72652D34322D6F726967696E616C2D696D6165616239323667756A7A7570372E6A706567740064687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F73686972742F7A2F792F672F333131342D6A6F7669616C2D6D6172742D73746F72652D33382D6F726967696E616C2D696D61656162393266706877767272612E6A706567740064687474703A2F2F696D6735612E666C6978636172742E636F6D2F696D6167652F73686972742F6D2F792F762F333132362D6A6F7669616C2D6D6172742D73746F72652D34322D6F726967696E616C2D696D61656162366662676439686A79762E6A706567740064687474703A2F2F696D6736612E666C6978636172742E636F6D2F696D6167652F73686972742F6D2F792F762F333132362D6A6F7669616C2D6D6172742D73746F72652D34302D6F726967696E616C2D696D6165616B35673873657A66676B792E6A70656778',1999,2,'DREECUY9TEUTKCHT',1000) | 2024-05-07 18:14:49.842 | took 63 ms | statement - connection 11
+insert into products_details (products_variants_id,variants_values_id) values (3,3) | 2024-05-07 18:14:49.864 | took 2 ms | statement - connection 11
+ | 2024-05-07 18:14:49.953 | took 95 ms | commit - connection 11
+select pve1_0.id,pve1_0.description,pve1_0.images,pve1_0.price,pve1_0.products_id,pve1_0.sku,pve1_0.stock from products_variants pve1_0 | 2024-05-07 18:15:00.237 | took 2 ms | statement - connection 12
+select pe1_0.id,pe1_0.categories_id,pe1_0.description,pe1_0.images,pe1_0.name,pe1_0.status from products pe1_0 where pe1_0.id=1 | 2024-05-07 18:15:00.253 | took 2 ms | statement - connection 12
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=2 | 2024-05-07 18:15:00.272 | took 2 ms | statement - connection 12
+select ce1_0.id,ce1_0.name,ce1_0.parent_category,ce1_0.status from categories ce1_0 where ce1_0.id=1 | 2024-05-07 18:15:00.284 | took 3 ms | statement - connection 12
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=1 | 2024-05-07 18:15:00.287 | took 2 ms | statement - connection 12
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=1 | 2024-05-07 18:15:00.287 | took 2 ms | statement - connection 12
+select p1_0.categories_id,p1_0.id,p1_0.description,p1_0.images,p1_0.name,p1_0.status from products p1_0 where p1_0.categories_id=2 | 2024-05-07 18:15:00.303 | took 3 ms | statement - connection 12
+select v1_0.categories_id,v1_0.id,v1_0.name from variants v1_0 where v1_0.categories_id=2 | 2024-05-07 18:15:00.303 | took 2 ms | statement - connection 12
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=1 | 2024-05-07 18:15:00.320 | took 2 ms | statement - connection 12
+select vv1_0.variants_id,vv1_0.id,vv1_0.value from variants_values vv1_0 where vv1_0.variants_id=2 | 2024-05-07 18:15:00.320 | took 2 ms | statement - connection 12
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=1 | 2024-05-07 18:15:00.335 | took 7 ms | statement - connection 12
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=1 | 2024-05-07 18:15:00.370 | took 5 ms | statement - connection 12
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=1 | 2024-05-07 18:15:00.378 | took 9 ms | statement - connection 12
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=2 | 2024-05-07 18:15:00.393 | took 4 ms | statement - connection 12
+select pv1_0.products_id,pv1_0.id,pv1_0.description,pv1_0.images,pv1_0.price,pv1_0.sku,pv1_0.stock from products_variants pv1_0 where pv1_0.products_id=2 | 2024-05-07 18:15:00.405 | took 7 ms | statement - connection 12
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=3 | 2024-05-07 18:15:00.414 | took 2 ms | statement - connection 12
+select pv1_0.variants_values_id,pv1_1.id,pv1_1.description,pv1_1.images,pv1_1.price,pv1_1.products_id,pv1_1.sku,pv1_1.stock from products_details pv1_0 join products_variants pv1_1 on pv1_1.id=pv1_0.products_variants_id where pv1_0.variants_values_id=3 | 2024-05-07 18:15:00.429 | took 16 ms | statement - connection 12
+select vv1_0.products_variants_id,vv1_1.id,vv1_1.value,vv1_1.variants_id from products_details vv1_0 join variants_values vv1_1 on vv1_1.id=vv1_0.variants_values_id where vv1_0.products_variants_id=2 | 2024-05-07 18:15:00.444 | took 2 ms | statement - connection 12
+ | 2024-05-07 18:15:00.469 | took 9 ms | commit - connection 12
