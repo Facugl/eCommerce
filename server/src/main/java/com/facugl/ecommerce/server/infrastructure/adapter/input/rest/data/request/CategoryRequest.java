@@ -4,11 +4,20 @@ import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.categories.CreateCategoryValidationGroup;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.categories.UpdateCategoryValidationGroup;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CategoryRequest {
 
 	@NotBlank(message = "Name shouldn't be null or empty", groups = { CreateCategoryValidationGroup.class })
@@ -16,10 +25,11 @@ public class CategoryRequest {
 			CreateCategoryValidationGroup.class, UpdateCategoryValidationGroup.class })
 	private String name;
 
+	@Enumerated(EnumType.STRING)
 	private CategoryStatus status;
 
-	@Size(max = 100, message = "Parent Category must be less than or equal to 100 characters", groups = {
+	@Positive(message = "Parent Category ID must be a positive number", groups = {
 			CreateCategoryValidationGroup.class, UpdateCategoryValidationGroup.class })
-	private String parentCategory;
+	private Long parentCategoryId;
 
 }

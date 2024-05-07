@@ -17,18 +17,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.facugl.ecommerce.server.application.mapper.ApplicationProductMapper;
+import com.facugl.ecommerce.server.application.mapper.ApplicationProductVariantMapper;
 import com.facugl.ecommerce.server.application.port.input.products.ActiveProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.CreateProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.DeleteProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.GetAllProductsUseCase;
+import com.facugl.ecommerce.server.application.port.input.products.GetAllProductsVariantsByProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.GetProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.UpdateProductUseCase;
-import com.facugl.ecommerce.server.application.service.CategoryService;
+import com.facugl.ecommerce.server.application.service.ProductService;
 import com.facugl.ecommerce.server.common.WebAdapter;
 import com.facugl.ecommerce.server.domain.model.products.Product;
 import com.facugl.ecommerce.server.domain.model.products.ProductStatus;
+import com.facugl.ecommerce.server.domain.model.productsVariants.ProductVariant;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request.ProductRequest;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.ProductResponse;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.ProductVariantResponse;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.products.CreateProductValidationGroup;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.products.UpdateProductValidationGroup;
 
@@ -40,26 +44,28 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/products")
 public class ProductRestAdapter {
 	private final ApplicationProductMapper productMapper;
+	private final ApplicationProductVariantMapper productVariantMapper;
 
 	private final CreateProductUseCase createProductUseCase;
 	private final GetProductUseCase getProductUseCase;
 	private final GetAllProductsUseCase getAllProductsUseCase;
+	private final GetAllProductsVariantsByProductUseCase getAllProductsVariantsByProductUseCase;
 	private final DeleteProductUseCase deleteProductUseCase;
 	private final UpdateProductUseCase updateProductUseCase;
 	private final ActiveProductUseCase activeProductUseCase;
 
-	private final CategoryService categoryService;
+	private final ProductService productService;
 
 	@PostMapping
 	public ResponseEntity<ProductResponse> createProduct(
 			@Validated(CreateProductValidationGroup.class) @RequestBody ProductRequest productToCreate) {
-		Product product = productMapper.mapProductRequestToProduct(productToCreate, categoryService);
+		Product product = productService.mapProductRequestToProduct(productToCreate);
 
 		Product createdProduct = createProductUseCase.createProduct(product);
 
 		return ResponseEntity
 				.status(HttpStatus.CREATED)
-				.body(productMapper.mapToProductResponse(createdProduct));
+				.body(productMapper.mapProductToProductResponse(createdProduct));
 	}
 
 	@GetMapping("/{id}")
@@ -68,14 +74,14 @@ public class ProductRestAdapter {
 
 		return ResponseEntity
 				.status(HttpStatus.OK)
-				.body(productMapper.mapToProductResponse(product));
+				.body(productMapper.mapProductToProductResponse(product));
 	}
 
 	@GetMapping
 	public ResponseEntity<List<ProductResponse>> getAllProducts() {
 		List<ProductResponse> productResponseList = getAllProductsUseCase.getAllProducts()
 				.stream()
-				.map(productMapper::mapToProductResponse)
+				.map(productMapper::mapProductToProductResponse)
 				.collect(Collectors.toList());
 
 		return ResponseEntity
@@ -96,13 +102,13 @@ public class ProductRestAdapter {
 	public ResponseEntity<ProductResponse> updateProduct(
 			@PathVariable Long id,
 			@Validated(UpdateProductValidationGroup.class) @RequestBody ProductRequest productToUpdate) {
-		Product product = productMapper.mapProductRequestToProduct(productToUpdate, categoryService);
+		Product product = productService.mapProductRequestToProduct(productToUpdate);
 
 		Product updatedProduct = updateProductUseCase.updateProduct(id, product);
 
 		return ResponseEntity
 				.status(HttpStatus.OK)
-				.body(productMapper.mapToProductResponse(updatedProduct));
+				.body(productMapper.mapProductToProductResponse(updatedProduct));
 	}
 
 	@PatchMapping("/{id}/active")
@@ -112,6 +118,20 @@ public class ProductRestAdapter {
 		return ResponseEntity
 				.status(HttpStatus.OK)
 				.build();
+	}
+
+	@GetMapping("/{id}/productsVariants")
+	public ResponseEntity<List<ProductVariantResponse>> getAllProductsVariants(@PathVariable Long id) {
+		List<ProductVariant> productVariantList = getAllProductsVariantsByProductUseCase.getAllProductsVariantsByProduct(id);
+
+		List<ProductVariantResponse> productVariantResponseList = productVariantList
+				.stream()
+				.map(productVariantMapper::mapProductVariantToProductVariantResponse)
+				.collect(Collectors.toList());
+
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(productVariantResponseList);
 	}
 
 }

@@ -8,12 +8,18 @@ import com.facugl.ecommerce.server.application.port.input.products.ActiveProduct
 import com.facugl.ecommerce.server.application.port.input.products.CreateProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.DeleteProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.GetAllProductsUseCase;
+import com.facugl.ecommerce.server.application.port.input.products.GetAllProductsVariantsByProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.GetProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.UpdateProductUseCase;
+import com.facugl.ecommerce.server.application.port.output.CategoryOutputPort;
 import com.facugl.ecommerce.server.application.port.output.ProductOutputPort;
 import com.facugl.ecommerce.server.common.UseCase;
+import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.domain.model.products.Product;
+import com.facugl.ecommerce.server.domain.model.products.Product.ProductBuilder;
 import com.facugl.ecommerce.server.domain.model.products.ProductStatus;
+import com.facugl.ecommerce.server.domain.model.productsVariants.ProductVariant;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request.ProductRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,11 +29,13 @@ public class ProductService implements
         CreateProductUseCase,
         GetProductUseCase,
         GetAllProductsUseCase,
+        GetAllProductsVariantsByProductUseCase,
         DeleteProductUseCase,
         UpdateProductUseCase,
         ActiveProductUseCase {
 
     private final ProductOutputPort productOutputPort;
+    private final CategoryOutputPort categoryOutputPort;
 
     @Transactional
     @Override
@@ -49,8 +57,8 @@ public class ProductService implements
 
     @Transactional(readOnly = true)
     @Override
-    public List<Product> getAllProductsByCategory(Long categoryId) {
-        return productOutputPort.getAllProductsByCategory(categoryId);
+    public List<ProductVariant> getAllProductsVariantsByProduct(Long productId) {
+        return productOutputPort.getAllProductsVariantsByProduct(productId);
     }
 
     @Transactional
@@ -71,6 +79,23 @@ public class ProductService implements
         if (status == ProductStatus.ENABLED || status == ProductStatus.DISABLED) {
             productOutputPort.activeProduct(id, status);
         }
+    }
+
+    @Transactional
+    public Product mapProductRequestToProduct(ProductRequest product) {
+        ProductBuilder productBuilder = Product.builder()
+                .name(product.getName())
+                .description(product.getDescription())
+                .images(product.getImages())
+                .status(product.getStatus());
+
+        if (product.getCategoryId() != null) {
+            Category parentCategory = categoryOutputPort.findCategoryById(product.getCategoryId());
+
+            productBuilder.category(parentCategory);
+        }
+
+        return productBuilder.build();
     }
 
 }

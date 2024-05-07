@@ -1,13 +1,21 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response;
 
-import com.facugl.ecommerce.server.domain.model.categories.Category;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.facugl.ecommerce.server.domain.model.products.ProductStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductResponse {
 
     private Long id;
@@ -16,11 +24,27 @@ public class ProductResponse {
 
     private String description;
 
-    private String image;
+    private List<String> images;
 
-    @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
-    private Category category;
+    @JsonBackReference
+    private CategoryResponse category;
+
+    @JsonManagedReference
+    private List<ProductVariantResponse> productsVariants = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "ProductResponse{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", images=" + images +
+                ", status='" + status + '\'' +
+                ", category='" + category.getName() + '\'' +
+                ", productsVariants=" + productsVariants.stream().map(ProductVariantResponse::getId).toList() +
+                "}";
+    }
 
 }

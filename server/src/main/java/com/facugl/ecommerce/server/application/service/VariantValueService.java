@@ -9,9 +9,13 @@ import com.facugl.ecommerce.server.application.port.input.variantsValues.DeleteV
 import com.facugl.ecommerce.server.application.port.input.variantsValues.GetAllVariantsValuesUseCase;
 import com.facugl.ecommerce.server.application.port.input.variantsValues.GetVariantValueUseCase;
 import com.facugl.ecommerce.server.application.port.input.variantsValues.UpdateVariantValueUseCase;
+import com.facugl.ecommerce.server.application.port.output.VariantOutputPort;
 import com.facugl.ecommerce.server.application.port.output.VariantValueOutputPort;
 import com.facugl.ecommerce.server.common.UseCase;
+import com.facugl.ecommerce.server.domain.model.variants.Variant;
 import com.facugl.ecommerce.server.domain.model.variantsValues.VariantValue;
+import com.facugl.ecommerce.server.domain.model.variantsValues.VariantValue.VariantValueBuilder;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request.VariantValueRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +29,7 @@ public class VariantValueService implements
         DeleteVariantValueUseCase {
 
     private final VariantValueOutputPort variantValueOutputPort;
+    private final VariantOutputPort variantOutputPort;
 
     @Transactional
     @Override
@@ -54,6 +59,20 @@ public class VariantValueService implements
     @Override
     public void deleteVariantValueById(Long id) {
         variantValueOutputPort.deleteVariantValueById(id);
+    }
+
+    @Transactional
+    public VariantValue mapVariantValueRequestToVariantValue(VariantValueRequest variantValue) {
+        VariantValueBuilder variantValueBuilder = VariantValue.builder()
+                .value(variantValue.getValue());
+
+        if (variantValue.getVariantId() != null) {
+            Variant variant = variantOutputPort.findVariantById(variantValue.getVariantId());
+
+            variantValueBuilder.variant(variant);
+        }
+
+        return variantValueBuilder.build();
     }
 
 }

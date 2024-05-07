@@ -1,11 +1,20 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response;
 
-import com.facugl.ecommerce.server.domain.model.categories.Category;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CategoryResponse {
 
     private Long id;
@@ -14,6 +23,24 @@ public class CategoryResponse {
 
     private CategoryStatus status;
 
-    private Category parentCategory;
+    private CategoryResponse parentCategory;
+
+    @JsonManagedReference
+    private Set<ProductResponse> products = new HashSet<>();
+
+    @JsonManagedReference
+    private Set<VariantResponse> variants = new HashSet<>();
+
+    @Override
+    public String toString() {
+        return "CategoryResponse{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", status='" + status + '\'' +
+                ", parentCategory='" + parentCategory.getName() + '\'' +
+                ", products=" + products.stream().map(ProductResponse::getName).toList() +
+                ", variants=" + variants.stream().map(VariantResponse::getName).toList() +
+                "}";
+    }
 
 }

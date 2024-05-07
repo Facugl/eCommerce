@@ -1,16 +1,39 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response;
 
-import com.facugl.ecommerce.server.domain.model.variants.Variant;
+import java.util.HashSet;
+import java.util.Set;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
-@Data
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class VariantValueResponse {
 
     private Long id;
 
     private String value;
 
-    private Variant variant;
+    @JsonBackReference
+    private VariantResponse variant;
+
+    @JsonBackReference
+    private Set<ProductVariantResponse> productsVariants = new HashSet<>();
+
+    @Override
+    public String toString() {
+        return "VariantValueResponse{" +
+                "id=" + id +
+                ", value='" + value + '\'' +
+                ", variant='" + variant.getName() + '\'' +
+                ", productsVariants=" + productsVariants.stream().map(ProductVariantResponse::getId).toList() +
+                "}";
+    }
 
 }
