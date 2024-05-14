@@ -40,7 +40,8 @@ public class ProductVariantPersistenceAdapter implements ProductVariantOutputPor
                 .findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Product with id: " + productId + " not found."));
 
-        List<ProductVariantEntity> productVariantEntitySet = productEntity.getProductsVariants();
+        List<ProductVariantEntity> productVariantEntitySet = productVariantRepository
+                .findProductsVariantsByProduct(productId);
 
         ProductVariantEntity productVariantEntity = productVariantMapper
                 .mapProductVariantToProductVariantEntity(productVariantToCreate);
@@ -84,6 +85,30 @@ public class ProductVariantPersistenceAdapter implements ProductVariantOutputPor
     public List<ProductVariant> getAllProductsVariants() {
         return productVariantRepository
                 .findAll()
+                .stream()
+                .map(productVariantEntity -> productVariantMapper.mapProductVariantEntityToProductVariant(
+                        productVariantEntity))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductVariant> getAllProductsVariantsByProduct(Long productId) {
+        List<ProductVariantEntity> productVariantEntities = productVariantRepository
+                .findProductsVariantsByProduct(productId);
+
+        return productVariantEntities
+                .stream()
+                .map(productVariantEntity -> productVariantMapper.mapProductVariantEntityToProductVariant(
+                        productVariantEntity))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductVariant> getAllProductsVariantsByVariantValue(Long variantValueId) {
+        List<ProductVariantEntity> productVariantEntities = productVariantRepository
+                .findProductsVariantsByVariantValue(variantValueId);
+
+        return productVariantEntities
                 .stream()
                 .map(productVariantEntity -> productVariantMapper.mapProductVariantEntityToProductVariant(
                         productVariantEntity))

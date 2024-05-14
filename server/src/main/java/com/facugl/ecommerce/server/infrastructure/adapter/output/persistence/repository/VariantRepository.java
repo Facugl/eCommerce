@@ -1,6 +1,5 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,13 +10,9 @@ import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.ent
 
 public interface VariantRepository extends JpaRepository<VariantEntity, Long> {
 
+    @Query("SELECT COUNT(v) = 0 FROM VariantEntity v WHERE LOWER(v.name) = LOWER(:name)")
+    boolean isVariantNameUnique(@Param("name") String name);
+
     Optional<VariantEntity> findByName(String name);
-
-    @Query("SELECT v FROM VariantEntity v WHERE v.category.id = :categoryId")
-    List<VariantEntity> findByCategoryId(@Param("categoryId") Long categoryId);
-
-    // @Query("SELECT v FROM VariantEntity v WHERE v.categoryId = :categoryId AND v.name = :variantName")
-    // List<VariantEntity> findByCategoryIdAndName(@Param("categoryId") Long categoryId,
-    //         @Param("variantName") String variantName);
 
 }

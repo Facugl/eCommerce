@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### logs ###
+src/main/resources/logs/ecommerce-queries.log
+src/main/resources/spy.properties
+src/main/resources/logback.xml

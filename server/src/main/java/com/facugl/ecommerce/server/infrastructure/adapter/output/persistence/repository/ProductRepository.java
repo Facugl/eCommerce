@@ -10,11 +10,7 @@ import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.ent
 
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 
-    @Query("SELECT p FROM ProductEntity p WHERE p.category.id = :categoryId")
-    List<ProductEntity> findByCategoryId(@Param("categoryId") Long categoryId);
-
-    // @Query("SELECT p FROM ProductEntity p WHERE p.categoryId = :categoryId AND p.name = :name")
-    // List<ProductEntity> findByCategoryIdAndName(@Param("categoryId") Long categoryId,
-    //         @Param("name") String name);
+    @Query("SELECT p FROM ProductEntity p JOIN FETCH p.category c WHERE c.id = :categoryId")
+    List<ProductEntity> findProductsByCategoryId(@Param("categoryId") Long categoryId);
 
 }

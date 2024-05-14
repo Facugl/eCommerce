@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.facugl.ecommerce.server.domain.model.products.Product;
 import com.facugl.ecommerce.server.domain.model.products.ProductStatus;
-import com.facugl.ecommerce.server.domain.model.productsVariants.ProductVariant;
 
 public interface ProductOutputPort {
 
@@ -14,7 +13,7 @@ public interface ProductOutputPort {
 
     List<Product> getAllProducts();
 
-    List<ProductVariant> getAllProductsVariantsByProduct(Long productId);
+    List<Product> getAllProductsByCategory(Long categoryId);
 
     void deleteProductById(Long id);
 

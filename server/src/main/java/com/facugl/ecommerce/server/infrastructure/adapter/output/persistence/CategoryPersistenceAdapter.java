@@ -10,12 +10,8 @@ import com.facugl.ecommerce.server.common.exception.generic.EntityNameNotUniqueE
 import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundException;
 import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
-import com.facugl.ecommerce.server.domain.model.products.Product;
-import com.facugl.ecommerce.server.domain.model.variants.Variant;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.categories.CategoryEntity;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceCategoryMapper;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceProductMapper;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceVariantMapper;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.CategoryRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -27,13 +23,6 @@ public class CategoryPersistenceAdapter implements CategoryOutputPort {
 	private final CategoryRepository categoryRepository;
 
 	private final PersistenceCategoryMapper categoryMapper;
-	private final PersistenceProductMapper productMapper;
-	private final PersistenceVariantMapper variantMapper;
-
-	@Override
-	public boolean isCategoryNameUnique(String name) {
-		return !categoryRepository.findByName(name).isPresent();
-	}
 
 	@Override
 	public Category createCategory(Category category) {
@@ -137,30 +126,6 @@ public class CategoryPersistenceAdapter implements CategoryOutputPort {
 		categoryEntity.setStatus(status);
 
 		categoryRepository.save(categoryEntity);
-	}
-
-	@Override
-	public List<Product> getAllProductsByCategory(Long categoryId) {
-		CategoryEntity categoryEntity = categoryRepository
-				.findById(categoryId)
-				.orElseThrow(() -> new EntityNotFoundException("Category with id: " + categoryId + " not found."));
-
-		return categoryEntity.getProducts()
-				.stream()
-				.map(productEntity -> productMapper.mapProductEntityToProduct(productEntity))
-				.collect(Collectors.toList());
-	}
-
-	@Override
-	public List<Variant> getAllVariantsByCategory(Long categoryId) {
-		CategoryEntity categoryEntity = categoryRepository
-				.findById(categoryId)
-				.orElseThrow(() -> new EntityNotFoundException("Category with id: " + categoryId + " not found."));
-
-		return categoryEntity.getVariants()
-				.stream()
-				.map(variantEntity -> variantMapper.mapVariantEntityToVariant(variantEntity))
-				.collect(Collectors.toList());
 	}
 
 }

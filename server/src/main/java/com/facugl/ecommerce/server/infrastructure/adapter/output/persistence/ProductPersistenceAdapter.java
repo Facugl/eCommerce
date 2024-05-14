@@ -1,7 +1,6 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.output.persistence;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.facugl.ecommerce.server.application.port.output.ProductOutputPort;
@@ -11,11 +10,9 @@ import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundExcept
 import com.facugl.ecommerce.server.common.exception.generic.ImageDuplicateException;
 import com.facugl.ecommerce.server.domain.model.products.Product;
 import com.facugl.ecommerce.server.domain.model.products.ProductStatus;
-import com.facugl.ecommerce.server.domain.model.productsVariants.ProductVariant;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.categories.CategoryEntity;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.products.ProductEntity;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceProductMapper;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceProductVariantMapper;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.CategoryRepository;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.ProductRepository;
 
@@ -29,7 +26,6 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
     private final CategoryRepository categoryRepository;
 
     private final PersistenceProductMapper productMapper;
-    private final PersistenceProductVariantMapper productVariantMapper;
 
     @Override
     public Product createProduct(Product productToCreate) {
@@ -39,7 +35,7 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
                 .findById(categoryId)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id: " + categoryId + " not found."));
 
-        Set<ProductEntity> productEntities = categoryEntity.getProducts();
+        List<ProductEntity> productEntities = productRepository.findProductsByCategoryId(categoryId);
 
         ProductEntity productEntity = productMapper.mapProductToProductEntity(productToCreate);
 
@@ -75,19 +71,15 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<ProductVariant> getAllProductsVariantsByProduct(Long productId) {
-        ProductEntity productEntity = productRepository
-                .findById(productId)
-                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + productId + " not found."));
+	@Override
+	public List<Product> getAllProductsByCategory(Long categoryId) {
+		List<ProductEntity> productEntities = productRepository.findProductsByCategoryId(categoryId);
 
-        return productEntity
-                .getProductsVariants()
-                .stream()
-                .map(productVariantEntity -> productVariantMapper.mapProductVariantEntityToProductVariant(
-                        productVariantEntity))
-                .collect(Collectors.toList());
-    }
+		return productEntities
+				.stream()
+				.map(productEntity -> productMapper.mapProductEntityToProduct(productEntity))
+				.collect(Collectors.toList());
+	}
 
     @Override
     public void deleteProductById(Long id) {
@@ -120,7 +112,7 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
                 if (!productImages.contains(image)) {
                     productImages.add(image);
                 } else {
-                    throw new ImageDuplicateException("The image URL already exists in the list.");
+                    throw new ImageDuplicateException("The image URL: " + image + " already exists in the list.");
                 }
             }
         }

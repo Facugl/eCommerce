@@ -12,6 +12,10 @@ public interface ProductVariantOutputPort {
 
     List<ProductVariant> getAllProductsVariants();
 
+    List<ProductVariant> getAllProductsVariantsByProduct(Long productId);
+
+    List<ProductVariant> getAllProductsVariantsByVariantValue(Long variantValueId);
+
     void deleteProductVariantById(Long id);
 
     ProductVariant updateProductVariant(Long id, ProductVariant productVariantToUpdate);

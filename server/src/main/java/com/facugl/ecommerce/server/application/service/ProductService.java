@@ -7,8 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.facugl.ecommerce.server.application.port.input.products.ActiveProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.CreateProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.DeleteProductUseCase;
+import com.facugl.ecommerce.server.application.port.input.products.GetAllProductsByCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.GetAllProductsUseCase;
-import com.facugl.ecommerce.server.application.port.input.products.GetAllProductsVariantsByProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.GetProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.UpdateProductUseCase;
 import com.facugl.ecommerce.server.application.port.output.CategoryOutputPort;
@@ -18,7 +18,6 @@ import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.domain.model.products.Product;
 import com.facugl.ecommerce.server.domain.model.products.Product.ProductBuilder;
 import com.facugl.ecommerce.server.domain.model.products.ProductStatus;
-import com.facugl.ecommerce.server.domain.model.productsVariants.ProductVariant;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request.ProductRequest;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,7 @@ public class ProductService implements
         CreateProductUseCase,
         GetProductUseCase,
         GetAllProductsUseCase,
-        GetAllProductsVariantsByProductUseCase,
+        GetAllProductsByCategoryUseCase,
         DeleteProductUseCase,
         UpdateProductUseCase,
         ActiveProductUseCase {
@@ -57,8 +56,8 @@ public class ProductService implements
 
     @Transactional(readOnly = true)
     @Override
-    public List<ProductVariant> getAllProductsVariantsByProduct(Long productId) {
-        return productOutputPort.getAllProductsVariantsByProduct(productId);
+    public List<Product> getAllProductsByCategory(Long categoryId) {
+        return productOutputPort.getAllProductsByCategory(categoryId);
     }
 
     @Transactional

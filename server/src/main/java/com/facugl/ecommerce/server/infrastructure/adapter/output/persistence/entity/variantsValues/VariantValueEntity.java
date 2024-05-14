@@ -86,7 +86,7 @@ public class VariantValueEntity implements Serializable {
 		return "VariantValueEntity{" +
 				"id=" + id +
 				", value='" + value + '\'' +
-				", variant='" + variant + '\'' +
+				", variant=" + variant +
 				", productsVariants=" + productsVariants.stream().map(ProductVariantEntity::getId).toList() +
 				"}";
 	}

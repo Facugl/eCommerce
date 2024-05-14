@@ -20,7 +20,6 @@ public class VariantValueResponse {
 
     private String value;
 
-    @JsonBackReference
     private VariantResponse variant;
 
     @JsonBackReference
@@ -31,7 +30,7 @@ public class VariantValueResponse {
         return "VariantValueResponse{" +
                 "id=" + id +
                 ", value='" + value + '\'' +
-                ", variant='" + variant.getName() + '\'' +
+                ", variant=" + variant +
                 ", productsVariants=" + productsVariants.stream().map(ProductVariantResponse::getId).toList() +
                 "}";
     }

@@ -1,10 +1,8 @@
 package com.facugl.ecommerce.server.domain.model.products;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.facugl.ecommerce.server.domain.model.categories.Category;
-import com.facugl.ecommerce.server.domain.model.productsVariants.ProductVariant;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,9 +29,6 @@ public class Product {
 
     private Category category;
 
-    @Builder.Default
-    private List<ProductVariant> productsVariants = new ArrayList<>();
-
     @Override
     public String toString() {
         return "Product{" +
@@ -41,9 +36,8 @@ public class Product {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", images=" + images +
-                ", status=" + status +
-                ", category='" + category.getName() + '\'' +
-                ", productsVariants=" + productsVariants.stream().map(ProductVariant::getId).toList() +
+                ", status='" + status + '\'' +
+                ", category='" + category +
                 "}";
     }
 

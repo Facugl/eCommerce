@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.facugl.ecommerce.server.application.mapper.ApplicationProductVariantMapper;
 import com.facugl.ecommerce.server.application.mapper.ApplicationVariantValueMapper;
+import com.facugl.ecommerce.server.application.port.input.productsVariants.GetAllProductsVariantsByVariantValueUseCase;
 import com.facugl.ecommerce.server.application.port.input.variantsValues.CreateVariantValueUseCase;
 import com.facugl.ecommerce.server.application.port.input.variantsValues.DeleteVariantValueUseCase;
 import com.facugl.ecommerce.server.application.port.input.variantsValues.GetAllVariantsValuesUseCase;
@@ -23,8 +25,10 @@ import com.facugl.ecommerce.server.application.port.input.variantsValues.GetVari
 import com.facugl.ecommerce.server.application.port.input.variantsValues.UpdateVariantValueUseCase;
 import com.facugl.ecommerce.server.application.service.VariantValueService;
 import com.facugl.ecommerce.server.common.WebAdapter;
+import com.facugl.ecommerce.server.domain.model.productsVariants.ProductVariant;
 import com.facugl.ecommerce.server.domain.model.variantsValues.VariantValue;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request.VariantValueRequest;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.ProductVariantResponse;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.VariantValueResponse;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.variantsValues.CreateVariantValueValidationGroup;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.variantsValues.UpdateVariantValueValidationGroup;
@@ -38,12 +42,14 @@ import lombok.RequiredArgsConstructor;
 public class VariantValueRestAdapter {
 
     private final ApplicationVariantValueMapper variantValueMapper;
+    private final ApplicationProductVariantMapper productVariantMapper;
 
     private final CreateVariantValueUseCase createVariantValueUseCase;
     private final GetVariantValueUseCase getVariantValueUseCase;
     private final GetAllVariantsValuesUseCase getAllVariantsValuesUseCase;
     private final UpdateVariantValueUseCase updateVariantValueUseCase;
     private final DeleteVariantValueUseCase deleteVariantValueUseCase;
+    private final GetAllProductsVariantsByVariantValueUseCase getAllProductsVariantsByVariantValueUseCase;
 
     private final VariantValueService variantValueService;
 
@@ -98,6 +104,21 @@ public class VariantValueRestAdapter {
         deleteVariantValueUseCase.deleteVariantValueById(id);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/{id}/productsVariants")
+    public ResponseEntity<List<ProductVariantResponse>> getAllProductsVariants(@PathVariable Long id) {
+        List<ProductVariant> productVariantList = getAllProductsVariantsByVariantValueUseCase
+                .getAllProductsVariantsByVariantValue(id);
+
+        List<ProductVariantResponse> productVariantResponseList = productVariantList
+                .stream()
+                .map(productVariantMapper::mapProductVariantToProductVariantResponse)
+                .collect(Collectors.toList());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(productVariantResponseList);
     }
 
 }

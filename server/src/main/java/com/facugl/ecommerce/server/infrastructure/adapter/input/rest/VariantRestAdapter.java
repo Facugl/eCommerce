@@ -20,10 +20,9 @@ import com.facugl.ecommerce.server.application.mapper.ApplicationVariantValueMap
 import com.facugl.ecommerce.server.application.port.input.variants.CreateVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.variants.DeleteVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.variants.GetAllVariantsUseCase;
-import com.facugl.ecommerce.server.application.port.input.variants.GetAllVariantsValuesByVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.variants.GetVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.variants.UpdateVariantUseCase;
-import com.facugl.ecommerce.server.application.service.VariantService;
+import com.facugl.ecommerce.server.application.port.input.variantsValues.GetAllVariantsValuesByVariantUseCase;
 import com.facugl.ecommerce.server.common.WebAdapter;
 import com.facugl.ecommerce.server.domain.model.variants.Variant;
 import com.facugl.ecommerce.server.domain.model.variantsValues.VariantValue;
@@ -51,12 +50,10 @@ public class VariantRestAdapter {
     private final DeleteVariantUseCase deleteVariantUseCase;
     private final UpdateVariantUseCase updateVariantUseCase;
 
-    private final VariantService variantService;
-
     @PostMapping
     public ResponseEntity<VariantResponse> createVariant(
             @RequestBody @Validated(CreateVariantValidationGroup.class) VariantRequest variantToCreate) {
-        Variant variant = variantService.mapVariantRequestToVariant(variantToCreate);
+        Variant variant = variantMapper.mapVariantRequestToVariant(variantToCreate);
 
         Variant createdVariant = createVariantUseCase.createVariant(variant);
 
@@ -97,7 +94,7 @@ public class VariantRestAdapter {
     public ResponseEntity<VariantResponse> updateVariant(
             @PathVariable Long id,
             @RequestBody @Validated(UpdateVariantValidationGroup.class) VariantRequest variantToUpdate) {
-        Variant variant = variantService.mapVariantRequestToVariant(variantToUpdate);
+        Variant variant = variantMapper.mapVariantRequestToVariant(variantToUpdate);
 
         Variant updatedVariant = updateVariantUseCase.updateVariant(id, variant);
 

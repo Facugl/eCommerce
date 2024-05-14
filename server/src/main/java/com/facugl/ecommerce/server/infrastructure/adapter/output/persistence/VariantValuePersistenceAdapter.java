@@ -33,7 +33,7 @@ public class VariantValuePersistenceAdapter implements VariantValueOutputPort {
 				.findById(variantId)
 				.orElseThrow(() -> new EntityNotFoundException("Variant with id: " + variantId + " not found."));
 
-		List<VariantValueEntity> variantValueEntityList = variantEntity.getVariantValues();
+		List<VariantValueEntity> variantValueEntityList = variantValueRepository.findVariantValuesByVariant(variantId);
 
 		VariantValueEntity variantValueEntity = variantValueMapper
 				.mapVariantValueToVariantValueEntity(valueToCreate);
@@ -72,6 +72,27 @@ public class VariantValuePersistenceAdapter implements VariantValueOutputPort {
 	public List<VariantValue> getAllVariantsValues() {
 		return variantValueRepository
 				.findAll()
+				.stream()
+				.map(variantValueEntity -> variantValueMapper.mapVariantValueEntityToVariantValue(variantValueEntity))
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<VariantValue> getAllVariantsValuesByVariant(Long variantId) {
+		List<VariantValueEntity> variantValues = variantValueRepository.findVariantValuesByVariant(variantId);
+
+		return variantValues
+				.stream()
+				.map(variantValueEntity -> variantValueMapper.mapVariantValueEntityToVariantValue(variantValueEntity))
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<VariantValue> getAllVariantsValuesByProductVariant(Long productVariantId) {
+		List<VariantValueEntity> variantValues = variantValueRepository
+				.findVariantValuesByProductVariant(productVariantId);
+
+		return variantValues
 				.stream()
 				.map(variantValueEntity -> variantValueMapper.mapVariantValueEntityToVariantValue(variantValueEntity))
 				.collect(Collectors.toList());

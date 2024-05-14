@@ -1,12 +1,8 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.categories;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.products.ProductEntity;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.variants.VariantEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -19,7 +15,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -51,14 +46,6 @@ public class CategoryEntity implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "parent_category")
     private CategoryEntity parentCategory;
-
-    @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "category", orphanRemoval = true)
-    private Set<ProductEntity> products = new HashSet<>();
-
-    @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "category", orphanRemoval = true)
-    private Set<VariantEntity> variants = new HashSet<>();
 
     @Override
     public int hashCode() {
@@ -96,10 +83,8 @@ public class CategoryEntity implements Serializable {
         return "CategoryEntity{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", status=" + status +
-                ", parentCategory='" + parentCategory + '\'' +
-                ", products=" + products.stream().map(ProductEntity::getName).toList() +
-                ", variants=" + variants.stream().map(VariantEntity::getName).toList() +
+                ", status='" + status + '\'' +
+                ", parentCategory=" + parentCategory +
                 "}";
     }
 

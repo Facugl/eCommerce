@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.facugl.ecommerce.server.application.port.input.productsVariants.CreateProductVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.productsVariants.DeleteProductVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.productsVariants.GetAllProductVariantsUseCase;
+import com.facugl.ecommerce.server.application.port.input.productsVariants.GetAllProductsVariantsByProductUseCase;
+import com.facugl.ecommerce.server.application.port.input.productsVariants.GetAllProductsVariantsByVariantValueUseCase;
 import com.facugl.ecommerce.server.application.port.input.productsVariants.GetProductVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.productsVariants.UpdateProductVariantUseCase;
 import com.facugl.ecommerce.server.application.port.output.ProductOutputPort;
@@ -29,6 +31,8 @@ public class ProductVariantService implements
         CreateProductVariantUseCase,
         GetProductVariantUseCase,
         GetAllProductVariantsUseCase,
+        GetAllProductsVariantsByProductUseCase,
+        GetAllProductsVariantsByVariantValueUseCase,
         UpdateProductVariantUseCase,
         DeleteProductVariantUseCase {
 
@@ -52,6 +56,18 @@ public class ProductVariantService implements
     @Override
     public List<ProductVariant> getAllProductsVariants() {
         return productVariantOutputPort.getAllProductsVariants();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<ProductVariant> getAllProductsVariantsByProduct(Long productId) {
+        return productVariantOutputPort.getAllProductsVariantsByProduct(productId);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<ProductVariant> getAllProductsVariantsByVariantValue(Long variantValueId) {
+        return productVariantOutputPort.getAllProductsVariantsByVariantValue(variantValueId);
     }
 
     @Transactional

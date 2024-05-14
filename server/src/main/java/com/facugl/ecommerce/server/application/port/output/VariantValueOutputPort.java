@@ -14,6 +14,10 @@ public interface VariantValueOutputPort {
 
     List<VariantValue> getAllVariantsValues();
 
+    List<VariantValue> getAllVariantsValuesByVariant(Long variantId);
+
+    List<VariantValue> getAllVariantsValuesByProductVariant(Long productVariantId);
+
     void deleteVariantValueById(Long id);
 
     VariantValue updateVariantValue(Long id, VariantValue valueToUpdate);

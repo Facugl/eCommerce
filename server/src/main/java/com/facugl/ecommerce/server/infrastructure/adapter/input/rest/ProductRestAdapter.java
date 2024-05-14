@@ -22,9 +22,9 @@ import com.facugl.ecommerce.server.application.port.input.products.ActiveProduct
 import com.facugl.ecommerce.server.application.port.input.products.CreateProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.DeleteProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.GetAllProductsUseCase;
-import com.facugl.ecommerce.server.application.port.input.products.GetAllProductsVariantsByProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.GetProductUseCase;
 import com.facugl.ecommerce.server.application.port.input.products.UpdateProductUseCase;
+import com.facugl.ecommerce.server.application.port.input.productsVariants.GetAllProductsVariantsByProductUseCase;
 import com.facugl.ecommerce.server.application.service.ProductService;
 import com.facugl.ecommerce.server.common.WebAdapter;
 import com.facugl.ecommerce.server.domain.model.products.Product;
@@ -43,6 +43,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/products")
 public class ProductRestAdapter {
+	
 	private final ApplicationProductMapper productMapper;
 	private final ApplicationProductVariantMapper productVariantMapper;
 

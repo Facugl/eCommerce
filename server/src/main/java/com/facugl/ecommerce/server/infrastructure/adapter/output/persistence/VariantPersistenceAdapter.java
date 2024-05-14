@@ -1,7 +1,6 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.output.persistence;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.facugl.ecommerce.server.application.port.output.VariantOutputPort;
@@ -9,12 +8,8 @@ import com.facugl.ecommerce.server.common.PersistenceAdapter;
 import com.facugl.ecommerce.server.common.exception.generic.EntityAlreadyExistsException;
 import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundException;
 import com.facugl.ecommerce.server.domain.model.variants.Variant;
-import com.facugl.ecommerce.server.domain.model.variantsValues.VariantValue;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.categories.CategoryEntity;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.variants.VariantEntity;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceVariantMapper;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceVariantValueMapper;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.CategoryRepository;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.VariantRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -24,33 +19,20 @@ import lombok.RequiredArgsConstructor;
 public class VariantPersistenceAdapter implements VariantOutputPort {
 
 	private final VariantRepository variantRepository;
-	private final CategoryRepository categoryRepository;
 
 	private final PersistenceVariantMapper variantMapper;
-	private final PersistenceVariantValueMapper variantValueMapper;
 
 	@Override
 	public Variant createVariant(Variant variantToCreate) {
-		Long categoryId = variantToCreate.getCategory().getId();
-
-		CategoryEntity categoryEntity = categoryRepository
-				.findById(categoryId)
-				.orElseThrow(() -> new EntityNotFoundException("Category with id: " + categoryId + " not found."));
-
-		Set<VariantEntity> variantEntityList = categoryEntity.getVariants();
-
-		VariantEntity variantEntity = variantMapper.mapVariantToVariantEntity(variantToCreate);
-
-		if (!variantEntityList.contains(variantEntity)) {
-			variantEntity.setCategory(categoryEntity);
+		if (variantRepository.isVariantNameUnique(variantToCreate.getName())) {
+			VariantEntity variantEntity = variantMapper.mapVariantToVariantEntity(variantToCreate);
 
 			VariantEntity savedVariantEntity = variantRepository.save(variantEntity);
 
 			return variantMapper.mapVariantEntityToVariant(savedVariantEntity);
 		} else {
 			throw new EntityAlreadyExistsException(
-					"Variant with id: " + variantEntity.getId() + " already exists in category with id: "
-							+ categoryEntity.getId());
+					"Variant with name: " + variantToCreate.getName() + " already exists.");
 		}
 	}
 
@@ -80,18 +62,6 @@ public class VariantPersistenceAdapter implements VariantOutputPort {
 	}
 
 	@Override
-	public List<VariantValue> getAllVariantsValuesByVariant(Long variantId) {
-		VariantEntity variantEntity = variantRepository
-				.findById(variantId)
-				.orElseThrow(() -> new EntityNotFoundException("Variant with id: " + variantId + " not found."));
-
-		return variantEntity.getVariantValues()
-				.stream()
-				.map(variantValueEntity -> variantValueMapper.mapVariantValueEntityToVariantValue(variantValueEntity))
-				.collect(Collectors.toList());
-	}
-
-	@Override
 	public void deleteVariantById(Long id) {
 		VariantEntity variantEntity = variantRepository
 				.findById(id)
@@ -108,17 +78,6 @@ public class VariantPersistenceAdapter implements VariantOutputPort {
 
 		if (variantToUpdate.getName() != null) {
 			variantEntity.setName(variantToUpdate.getName());
-		}
-
-		if (variantToUpdate.getCategory() != null) {
-			Long categoryId = variantToUpdate.getCategory().getId();
-
-			CategoryEntity categoryEntity = categoryRepository
-					.findById(categoryId)
-					.orElseThrow(() -> new EntityNotFoundException(
-							"Category with id: " + categoryId + " not found."));
-
-			variantEntity.setCategory(categoryEntity);
 		}
 
 		variantRepository.save(variantEntity);

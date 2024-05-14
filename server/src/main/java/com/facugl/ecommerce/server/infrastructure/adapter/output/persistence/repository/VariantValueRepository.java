@@ -1,5 +1,6 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,8 +16,10 @@ public interface VariantValueRepository extends JpaRepository<VariantValueEntity
 
     Optional<VariantValueEntity> findVariantValueByValue(String value);
 
-    // @Query("SELECT v FROM VariantValueEntity v WHERE v.variant.name = :variantName AND v.value = :value")
-    // List<VariantValueEntity> findyByVariantNameAndValue(@Param("variantName") String variantName,
-    //         @Param("value") String value);
+    @Query("SELECT vv FROM VariantValueEntity vv JOIN FETCH vv.variant v WHERE v.id = :variantId")
+    List<VariantValueEntity> findVariantValuesByVariant(Long variantId);
+
+    @Query("SELECT vv FROM VariantValueEntity vv JOIN FETCH vv.productsVariants pv WHERE pv.id = :productVariantId")
+    List<VariantValueEntity> findVariantValuesByProductVariant(Long productVariantId);
 
 }
