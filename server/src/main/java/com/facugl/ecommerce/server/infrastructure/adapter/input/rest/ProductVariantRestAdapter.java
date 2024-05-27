@@ -20,7 +20,6 @@ import com.facugl.ecommerce.server.application.mapper.ApplicationVariantValueMap
 import com.facugl.ecommerce.server.application.port.input.productsVariants.CreateProductVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.productsVariants.DeleteProductVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.productsVariants.GetAllProductVariantsUseCase;
-import com.facugl.ecommerce.server.application.port.input.productsVariants.GetAllProductsVariantsByVariantValueUseCase;
 import com.facugl.ecommerce.server.application.port.input.productsVariants.GetProductVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.productsVariants.UpdateProductVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.variantsValues.GetAllVariantsValuesByProductVariantUseCase;

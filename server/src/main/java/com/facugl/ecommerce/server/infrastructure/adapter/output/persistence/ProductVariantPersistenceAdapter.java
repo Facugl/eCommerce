@@ -75,7 +75,7 @@ public class ProductVariantPersistenceAdapter implements ProductVariantOutputPor
     @Override
     public ProductVariant findProductVariantById(Long id) {
         return productVariantRepository
-                .findById(id)
+                .findProductVariantWithVariantsValuesById(id)
                 .map(productVariantEntity -> productVariantMapper.mapProductVariantEntityToProductVariant(
                         productVariantEntity))
                 .orElseThrow(() -> new EntityNotFoundException("Product variant with id: " + id + " not found."));
@@ -84,7 +84,7 @@ public class ProductVariantPersistenceAdapter implements ProductVariantOutputPor
     @Override
     public List<ProductVariant> getAllProductsVariants() {
         return productVariantRepository
-                .findAll()
+                .findAllProductVariantsWithVariantsValues()
                 .stream()
                 .map(productVariantEntity -> productVariantMapper.mapProductVariantEntityToProductVariant(
                         productVariantEntity))
@@ -118,7 +118,7 @@ public class ProductVariantPersistenceAdapter implements ProductVariantOutputPor
     @Override
     public ProductVariant updateProductVariant(Long id, ProductVariant productVariantToUpdate) {
         ProductVariantEntity productVariantEntity = productVariantRepository
-                .findById(id)
+                .findProductVariantWithVariantsValuesById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product variant with id: " + id + " not found."));
 
         if (productVariantToUpdate.getDescription() != null) {
@@ -179,7 +179,7 @@ public class ProductVariantPersistenceAdapter implements ProductVariantOutputPor
     @Override
     public void deleteProductVariantById(Long id) {
         ProductVariantEntity productVariantEntity = productVariantRepository
-                .findById(id)
+                .findProductVariantWithVariantsValuesById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product variant with id: " + id + " not found."));
 
         productVariantEntity.getVariantsValues().clear();

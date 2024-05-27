@@ -16,7 +16,13 @@ public interface VariantValueRepository extends JpaRepository<VariantValueEntity
 
     Optional<VariantValueEntity> findVariantValueByValue(String value);
 
-    @Query("SELECT vv FROM VariantValueEntity vv JOIN FETCH vv.variant v WHERE v.id = :variantId")
+    @Query("SELECT vv FROM VariantValueEntity vv JOIN FETCH vv.variant JOIN FETCH vv.productsVariants WHERE vv.id = :variantValueId")
+    Optional<VariantValueEntity> findVariantValueEntityWithVariantById(@Param("variantValueId") Long variantValueId);
+
+    @Query("SELECT vv FROM VariantValueEntity vv JOIN FETCH vv.variant JOIN FETCH vv.productsVariants")
+    List<VariantValueEntity> findAllVariantValueEntitiesWithVariant();
+
+    @Query("SELECT vv FROM VariantValueEntity vv JOIN FETCH vv.productsVariants JOIN FETCH vv.variant v WHERE v.id = :variantId")
     List<VariantValueEntity> findVariantValuesByVariant(Long variantId);
 
     @Query("SELECT vv FROM VariantValueEntity vv JOIN FETCH vv.productsVariants pv WHERE pv.id = :productVariantId")

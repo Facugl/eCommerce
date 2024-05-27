@@ -58,14 +58,14 @@ public class CategoryPersistenceAdapter implements CategoryOutputPort {
 	@Override
 	public Category findCategoryById(Long id) {
 		return categoryRepository
-				.findById(id)
+				.findCategoryWithParentCategoryById(id)
 				.map(categoryEntity -> categoryMapper.mapCategoryEntityToCategory(categoryEntity))
 				.orElseThrow(() -> new EntityNotFoundException("Category with id: " + id + " not found."));
 	}
 
 	@Override
 	public List<Category> getAllCategories() {
-		List<CategoryEntity> categoryEntityList = categoryRepository.findAll();
+		List<CategoryEntity> categoryEntityList = categoryRepository.findAllCategoriesWithParentCategory();
 
 		return categoryEntityList
 				.stream()
@@ -85,7 +85,7 @@ public class CategoryPersistenceAdapter implements CategoryOutputPort {
 
 	@Override
 	public List<Category> getAllSubCategories(Long parentId) {
-		List<CategoryEntity> categoryEntityList = categoryRepository.findByParentCategory_Id(parentId);
+		List<CategoryEntity> categoryEntityList = categoryRepository.findAllSubCategoriesByParentCategory(parentId);
 
 		return categoryEntityList
 				.stream()
@@ -96,7 +96,7 @@ public class CategoryPersistenceAdapter implements CategoryOutputPort {
 	@Override
 	public Category updateCategory(Long id, Category category) {
 		CategoryEntity categoryEntity = categoryRepository
-				.findById(id)
+				.findCategoryWithParentCategoryById(id)
 				.orElseThrow(() -> new EntityNotFoundException("Category with id: " + id + " not found."));
 
 		if (category.getName() != null) {
@@ -120,7 +120,7 @@ public class CategoryPersistenceAdapter implements CategoryOutputPort {
 	@Override
 	public void activeCategory(Long id, CategoryStatus status) {
 		CategoryEntity categoryEntity = categoryRepository
-				.findById(id)
+				.findCategoryWithParentCategoryById(id)
 				.orElseThrow(() -> new EntityNotFoundException("Category with id: " + id + " not found."));
 
 		categoryEntity.setStatus(status);

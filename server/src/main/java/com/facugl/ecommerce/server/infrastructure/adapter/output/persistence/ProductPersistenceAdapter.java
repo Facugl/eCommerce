@@ -56,14 +56,14 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
     @Override
     public Product findProductById(Long id) {
         return productRepository
-                .findById(id)
+                .findProductWithCategoryById(id)
                 .map(productEntity -> productMapper.mapProductEntityToProduct(productEntity))
                 .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
     }
 
     @Override
     public List<Product> getAllProducts() {
-        List<ProductEntity> productEntityList = productRepository.findAll();
+        List<ProductEntity> productEntityList = productRepository.findAllProductsWithCategory();
 
         return productEntityList
                 .stream()
@@ -84,7 +84,7 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
     @Override
     public void deleteProductById(Long id) {
         ProductEntity productEntity = productRepository
-                .findById(id)
+                .findProductWithCategoryById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
 
         productRepository.delete(productEntity);
@@ -93,7 +93,7 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
     @Override
     public Product updateProduct(Long id, Product productToUpdate) {
         ProductEntity productEntity = productRepository
-                .findById(id)
+                .findProductWithCategoryById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
 
         if (productToUpdate.getName() != null) {

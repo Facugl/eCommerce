@@ -54,7 +54,7 @@ public class VariantValuePersistenceAdapter implements VariantValueOutputPort {
 	@Override
 	public VariantValue findVariantValueById(Long id) {
 		return variantValueRepository
-				.findById(id)
+				.findVariantValueEntityWithVariantById(id)
 				.map(variantValueEntity -> variantValueMapper.mapVariantValueEntityToVariantValue(variantValueEntity))
 				.orElseThrow(() -> new EntityNotFoundException(
 						"Variant value with id: " + id + " not found."));
@@ -71,7 +71,7 @@ public class VariantValuePersistenceAdapter implements VariantValueOutputPort {
 	@Override
 	public List<VariantValue> getAllVariantsValues() {
 		return variantValueRepository
-				.findAll()
+				.findAllVariantValueEntitiesWithVariant()
 				.stream()
 				.map(variantValueEntity -> variantValueMapper.mapVariantValueEntityToVariantValue(variantValueEntity))
 				.collect(Collectors.toList());
@@ -101,7 +101,7 @@ public class VariantValuePersistenceAdapter implements VariantValueOutputPort {
 	@Override
 	public VariantValue updateVariantValue(Long id, VariantValue valueToUpdate) {
 		VariantValueEntity variantValueEntity = variantValueRepository
-				.findById(id)
+				.findVariantValueEntityWithVariantById(id)
 				.orElseThrow(() -> new EntityNotFoundException(
 						"Variant value with id: " + id + " not found."));
 
@@ -128,7 +128,7 @@ public class VariantValuePersistenceAdapter implements VariantValueOutputPort {
 	@Override
 	public void deleteVariantValueById(Long id) {
 		VariantValueEntity variantValueEntity = variantValueRepository
-				.findById(id)
+				.findVariantValueEntityWithVariantById(id)
 				.orElseThrow(() -> new EntityNotFoundException(
 						"Variant value with id: " + id + " not found."));
 

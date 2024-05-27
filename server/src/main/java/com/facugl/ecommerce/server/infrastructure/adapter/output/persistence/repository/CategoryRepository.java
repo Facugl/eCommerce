@@ -14,12 +14,19 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
     @Query("SELECT COUNT(c) = 0 FROM CategoryEntity c WHERE LOWER(c.name) = LOWER(:name)")
     boolean isCategoryNameUnique(@Param("name") String name);
 
+    @Query("SELECT c FROM CategoryEntity c JOIN FETCH c.parentCategory pc WHERE c.id = :categoryId")
+    Optional<CategoryEntity> findCategoryWithParentCategoryById(@Param("categoryId") Long categoryId);
+
+    @Query("SELECT c FROM CategoryEntity c JOIN FETCH c.parentCategory pc")
+    List<CategoryEntity> findAllCategoriesWithParentCategory();
+
     Optional<CategoryEntity> findByName(String name);
 
     List<CategoryEntity> findByStatusTrue();
 
     List<CategoryEntity> findByParentCategoryIsNull();
 
-    List<CategoryEntity> findByParentCategory_Id(Long parentId);
+    @Query("SELECT c FROM CategoryEntity c JOIN FETCH c.parentCategory pc WHERE pc.id = :parentCategoryId")
+    List<CategoryEntity> findAllSubCategoriesByParentCategory(@Param("parentCategoryId") Long parentCategoryId);
 
 }
