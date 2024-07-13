@@ -1,6 +1,5 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper;
 
-import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -13,7 +12,6 @@ public interface PersistenceCategoryMapper {
 	@Mapping(target = "id", ignore = true)
 	CategoryEntity mapCategoryToCategoryEntity(Category category);
 
-	@InheritInverseConfiguration
-	Category mapCategoryEntityToCategory(CategoryEntity entity);
+	Category mapCategoryEntityToCategory(CategoryEntity categoryEntity);
 
 }

@@ -31,12 +31,13 @@ public class CategoryService implements
         GetAllSubCategoriesUseCase,
         UpdateCategoryUseCase,
         ActiveCategoryUseCase {
-
     private final CategoryOutputPort categoryOutputPort;
 
     @Transactional
     @Override
     public Category createCategory(Category category) {
+        category.setStatus(CategoryStatus.ENABLED);
+        
         return categoryOutputPort.createCategory(category);
     }
 
@@ -85,18 +86,16 @@ public class CategoryService implements
     }
 
     @Transactional
-    public Category mapCategoryRequestToCategory(CategoryRequest category) {
-        CategoryBuilder categoryBuilder = Category.builder()
-                .name(category.getName())
-                .status(category.getStatus());
+    public Category mapCategoryRequestToCategory(CategoryRequest categoryToCreate) {
+        CategoryBuilder category = Category.builder()
+                .name(categoryToCreate.getName());
 
-        if (category.getParentCategoryId() != null) {
-            Category parentCategory = categoryOutputPort.findCategoryById(category.getParentCategoryId());
+        if (categoryToCreate.getParentCategoryId() != null) {
+            Category parentCategory = categoryOutputPort.findCategoryById(categoryToCreate.getParentCategoryId());
 
-            categoryBuilder.parentCategory(parentCategory);
+            category.parentCategory(parentCategory);
         }
 
-        return categoryBuilder.build();
+        return category.build();
     }
-
 }

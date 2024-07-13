@@ -6,22 +6,20 @@ import java.util.Optional;
 import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
 
-public interface CategoryOutputPort {
+public interface CategoryOutputPort {    
+    Category createCategory(Category categoryToCreate);
     
-    Category createCategory(Category category);
+    Category findCategoryById(Long categoryId);
     
-    Category findCategoryById(Long id);
-    
-    Optional<Category> findCategoryByName(String name);
+    Optional<Category> findCategoryByName(String categoryName);
     
     List<Category> getAllCategories();
 
     List<Category> getAllMainCategories();
 
-    List<Category> getAllSubCategories(Long parentId);
+    List<Category> getAllSubCategories(Long parentCategoryId);
 
-    Category updateCategory(Long id, Category category);
+    Category updateCategory(Long categoryId, Category categoryToUpdate);
 
-    void activeCategory(Long id, CategoryStatus status);
-
+    void activeCategory(Long categoryId, CategoryStatus status);
 }
