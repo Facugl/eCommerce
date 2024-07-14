@@ -32,20 +32,21 @@ public class ProductService implements
         DeleteProductUseCase,
         UpdateProductUseCase,
         ActiveProductUseCase {
-
     private final ProductOutputPort productOutputPort;
     private final CategoryOutputPort categoryOutputPort;
 
     @Transactional
     @Override
-    public Product createProduct(Product product) {
-        return productOutputPort.createProduct(product);
+    public Product createProduct(Product productToCreate) {
+        productToCreate.setStatus(ProductStatus.ENABLED);
+
+        return productOutputPort.createProduct(productToCreate);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Product getProductById(Long id) {
-        return productOutputPort.findProductById(id);
+    public Product getProductById(Long productId) {
+        return productOutputPort.findProductById(productId);
     }
 
     @Transactional(readOnly = true)
@@ -62,39 +63,38 @@ public class ProductService implements
 
     @Transactional
     @Override
-    public void deleteProductById(Long id) {
-        productOutputPort.deleteProductById(id);
+    public void deleteProductById(Long productId) {
+        productOutputPort.deleteProductById(productId);
     }
 
     @Transactional
     @Override
-    public Product updateProduct(Long id, Product productToUpdate) {
-        return productOutputPort.updateProduct(id, productToUpdate);
+    public Product updateProduct(Long productId, Product productToUpdate) {
+        return productOutputPort.updateProduct(productId, productToUpdate);
     }
 
     @Transactional
     @Override
-    public void activeProduct(Long id, ProductStatus status) {
+    public void activeProduct(Long productId, ProductStatus status) {
         if (status == ProductStatus.ENABLED || status == ProductStatus.DISABLED) {
-            productOutputPort.activeProduct(id, status);
+            productOutputPort.activeProduct(productId, status);
         }
     }
 
     @Transactional
-    public Product mapProductRequestToProduct(ProductRequest product) {
+    public Product mapProductRequestToProduct(ProductRequest productToCreate) {
         ProductBuilder productBuilder = Product.builder()
-                .name(product.getName())
-                .description(product.getDescription())
-                .images(product.getImages())
-                .status(product.getStatus());
+                .name(productToCreate.getName())
+                .description(productToCreate.getDescription())
+                .images(productToCreate.getImages())
+                .status(productToCreate.getStatus());
 
-        if (product.getCategoryId() != null) {
-            Category parentCategory = categoryOutputPort.findCategoryById(product.getCategoryId());
+        if (productToCreate.getCategoryId() != null) {
+            Category category = categoryOutputPort.findCategoryById(productToCreate.getCategoryId());
 
-            productBuilder.category(parentCategory);
+            productBuilder.category(category);
         }
 
         return productBuilder.build();
     }
-
 }

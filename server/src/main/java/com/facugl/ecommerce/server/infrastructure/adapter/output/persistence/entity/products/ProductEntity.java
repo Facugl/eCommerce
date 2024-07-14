@@ -37,16 +37,16 @@ public class ProductEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String name;
 
-    @Column(name = "description", length = 5000)
+    @Column(length = 5000)
     private String description;
 
-    @Column(name = "images", nullable = false)
+    @Column(nullable = false)
     private List<String> images;
 
-    @Column(name = "status", nullable = false)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 

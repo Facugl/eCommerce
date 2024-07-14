@@ -1,5 +1,5 @@
 package com.facugl.ecommerce.server.application.port.input.products;
 
 public interface DeleteProductUseCase {
-    void deleteProductById(Long id);
+    void deleteProductById(Long productId);
 }

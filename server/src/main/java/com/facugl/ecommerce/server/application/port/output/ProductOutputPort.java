@@ -6,19 +6,17 @@ import com.facugl.ecommerce.server.domain.model.products.Product;
 import com.facugl.ecommerce.server.domain.model.products.ProductStatus;
 
 public interface ProductOutputPort {
+    Product createProduct(Product productToCreate);
 
-    Product createProduct(Product product);
-
-    Product findProductById(Long id);
+    Product findProductById(Long productId);
 
     List<Product> getAllProducts();
 
     List<Product> getAllProductsByCategory(Long categoryId);
 
-    void deleteProductById(Long id);
+    void deleteProductById(Long productId);
 
-    Product updateProduct(Long id, Product productToUpdate);
+    Product updateProduct(Long productId, Product productToUpdate);
 
-    void activeProduct(Long id, ProductStatus status);
-
+    void activeProduct(Long productId, ProductStatus status);
 }

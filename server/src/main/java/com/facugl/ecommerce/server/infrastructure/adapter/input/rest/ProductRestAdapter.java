@@ -43,10 +43,8 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/products")
 public class ProductRestAdapter {
-	
 	private final ApplicationProductMapper productMapper;
 	private final ApplicationProductVariantMapper productVariantMapper;
-
 	private final CreateProductUseCase createProductUseCase;
 	private final GetProductUseCase getProductUseCase;
 	private final GetAllProductsUseCase getAllProductsUseCase;
@@ -54,7 +52,6 @@ public class ProductRestAdapter {
 	private final DeleteProductUseCase deleteProductUseCase;
 	private final UpdateProductUseCase updateProductUseCase;
 	private final ActiveProductUseCase activeProductUseCase;
-
 	private final ProductService productService;
 
 	@PostMapping
@@ -80,14 +77,14 @@ public class ProductRestAdapter {
 
 	@GetMapping
 	public ResponseEntity<List<ProductResponse>> getAllProducts() {
-		List<ProductResponse> productResponseList = getAllProductsUseCase.getAllProducts()
+		List<ProductResponse> products = getAllProductsUseCase.getAllProducts()
 				.stream()
 				.map(productMapper::mapProductToProductResponse)
 				.collect(Collectors.toList());
 
 		return ResponseEntity
 				.status(HttpStatus.OK)
-				.body(productResponseList);
+				.body(products);
 	}
 
 	@DeleteMapping("/{id}")
@@ -123,16 +120,14 @@ public class ProductRestAdapter {
 
 	@GetMapping("/{id}/productsVariants")
 	public ResponseEntity<List<ProductVariantResponse>> getAllProductsVariants(@PathVariable Long id) {
-		List<ProductVariant> productVariantList = getAllProductsVariantsByProductUseCase.getAllProductsVariantsByProduct(id);
-
-		List<ProductVariantResponse> productVariantResponseList = productVariantList
+		List<ProductVariantResponse> productsVariants = getAllProductsVariantsByProductUseCase
+				.getAllProductsVariantsByProduct(id)
 				.stream()
 				.map(productVariantMapper::mapProductVariantToProductVariantResponse)
 				.collect(Collectors.toList());
 
 		return ResponseEntity
 				.status(HttpStatus.OK)
-				.body(productVariantResponseList);
+				.body(productsVariants);
 	}
-
 }

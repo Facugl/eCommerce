@@ -3,5 +3,5 @@ package com.facugl.ecommerce.server.application.port.input.products;
 import com.facugl.ecommerce.server.domain.model.products.Product;
 
 public interface GetProductUseCase {
-    Product getProductById(Long id);
+    Product getProductById(Long productId);
 }

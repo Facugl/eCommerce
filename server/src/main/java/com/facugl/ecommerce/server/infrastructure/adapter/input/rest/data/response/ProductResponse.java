@@ -1,5 +1,6 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.facugl.ecommerce.server.domain.model.products.ProductStatus;
@@ -13,18 +14,13 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductResponse {
+public class ProductResponse implements Serializable {
 
     private Long id;
-
     private String name;
-
     private String description;
-
     private List<String> images;
-
     private ProductStatus status;
-
     private CategoryResponse category;
 
     @Override

@@ -7,7 +7,5 @@ import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.respon
 
 @Mapper(componentModel = "spring")
 public interface ApplicationProductMapper {
-
     ProductResponse mapProductToProductResponse(Product product);
-
 }

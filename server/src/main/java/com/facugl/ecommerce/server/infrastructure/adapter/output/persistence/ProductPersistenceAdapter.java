@@ -5,11 +5,11 @@ import java.util.stream.Collectors;
 
 import com.facugl.ecommerce.server.application.port.output.ProductOutputPort;
 import com.facugl.ecommerce.server.common.PersistenceAdapter;
-import com.facugl.ecommerce.server.common.exception.generic.EntityAlreadyExistsException;
-import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundException;
-import com.facugl.ecommerce.server.common.exception.generic.ImageDuplicateException;
 import com.facugl.ecommerce.server.domain.model.products.Product;
 import com.facugl.ecommerce.server.domain.model.products.ProductStatus;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.generic.EntityAlreadyExistsException;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.generic.EntityNotFoundException;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.generic.ImageDuplicateException;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.categories.CategoryEntity;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.products.ProductEntity;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceProductMapper;
@@ -21,10 +21,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @PersistenceAdapter
 public class ProductPersistenceAdapter implements ProductOutputPort {
-
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-
     private final PersistenceProductMapper productMapper;
 
     @Override
@@ -35,14 +33,12 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
                 .findById(categoryId)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id: " + categoryId + " not found."));
 
-        List<ProductEntity> productEntities = productRepository.findProductsByCategoryId(categoryId);
+        List<ProductEntity> products = productRepository.findProductsByCategoryId(categoryId);
 
         ProductEntity productEntity = productMapper.mapProductToProductEntity(productToCreate);
 
-        if (!productEntities.contains(productEntity)) {
+        if (!products.contains(productEntity)) {
             productEntity.setCategory(categoryEntity);
-
-            productEntity.setStatus(ProductStatus.ENABLED);
 
             ProductEntity createdProduct = productRepository.save(productEntity);
 
@@ -54,47 +50,43 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
     }
 
     @Override
-    public Product findProductById(Long id) {
+    public Product findProductById(Long productId) {
         return productRepository
-                .findProductWithCategoryById(id)
-                .map(productEntity -> productMapper.mapProductEntityToProduct(productEntity))
-                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
+                .findProductWithCategoryById(productId)
+                .map(productMapper::mapProductEntityToProduct)
+                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + productId + " not found."));
     }
 
     @Override
     public List<Product> getAllProducts() {
-        List<ProductEntity> productEntityList = productRepository.findAllProductsWithCategory();
-
-        return productEntityList
+        return productRepository.findAllProductsWithCategory()
                 .stream()
-                .map(product -> productMapper.mapProductEntityToProduct(product))
+                .map(productMapper::mapProductEntityToProduct)
                 .collect(Collectors.toList());
     }
 
-	@Override
-	public List<Product> getAllProductsByCategory(Long categoryId) {
-		List<ProductEntity> productEntities = productRepository.findProductsByCategoryId(categoryId);
-
-		return productEntities
-				.stream()
-				.map(productEntity -> productMapper.mapProductEntityToProduct(productEntity))
-				.collect(Collectors.toList());
-	}
+    @Override
+    public List<Product> getAllProductsByCategory(Long categoryId) {
+        return productRepository.findProductsByCategoryId(categoryId)
+                .stream()
+                .map(productMapper::mapProductEntityToProduct)
+                .collect(Collectors.toList());
+    }
 
     @Override
-    public void deleteProductById(Long id) {
+    public void deleteProductById(Long productId) {
         ProductEntity productEntity = productRepository
-                .findProductWithCategoryById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
+                .findProductWithCategoryById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + productId + " not found."));
 
         productRepository.delete(productEntity);
     }
 
     @Override
-    public Product updateProduct(Long id, Product productToUpdate) {
+    public Product updateProduct(Long productId, Product productToUpdate) {
         ProductEntity productEntity = productRepository
-                .findProductWithCategoryById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
+                .findProductWithCategoryById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + productId + " not found."));
 
         if (productToUpdate.getName() != null) {
             productEntity.setName(productToUpdate.getName());
@@ -134,14 +126,13 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
     }
 
     @Override
-    public void activeProduct(Long id, ProductStatus status) {
+    public void activeProduct(Long productId, ProductStatus status) {
         ProductEntity productEntity = productRepository
-                .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
+                .findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + productId + " not found."));
 
         productEntity.setStatus(status);
 
         productRepository.save(productEntity);
     }
-
 }

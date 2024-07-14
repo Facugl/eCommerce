@@ -18,15 +18,10 @@ import lombok.Setter;
 public class Product {
 
     private Long id;
-
     private String name;
-
     private String description;
-
     private List<String> images;
-
     private ProductStatus status;
-
     private Category category;
 
     @Override
@@ -40,5 +35,5 @@ public class Product {
                 ", category='" + category +
                 "}";
     }
-
+    
 }
