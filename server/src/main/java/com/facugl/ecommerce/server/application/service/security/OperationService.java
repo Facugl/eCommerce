@@ -72,7 +72,7 @@ public class OperationService implements
     public Operation mapOperationRequestToOperation(OperationRequest operationToCreate) {
         OperationBuilder operation = Operation.builder()
                 .name(operationToCreate.getName())
-                .path(operationToCreate.getHttpMethod())
+                .path(operationToCreate.getPath())
                 .httpMethod(operationToCreate.getHttpMethod())
                 .permitAll(operationToCreate.isPermitAll());
 

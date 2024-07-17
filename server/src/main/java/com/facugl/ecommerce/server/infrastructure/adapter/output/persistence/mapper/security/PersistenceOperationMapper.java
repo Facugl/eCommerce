@@ -12,6 +12,6 @@ public interface PersistenceOperationMapper {
     @Mapping(target = "id", ignore = true)
     OperationEntity mapOperationToOperationEntity(Operation operation);
 
-    Operation mapOperationEntitytoOperation(OperationEntity operationEntity);
+    Operation mapOperationEntityToOperation(OperationEntity operationEntity);
 
 }

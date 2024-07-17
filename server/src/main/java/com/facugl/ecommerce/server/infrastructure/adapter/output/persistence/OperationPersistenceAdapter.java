@@ -30,7 +30,7 @@ public class OperationPersistenceAdapter implements OperationOutputPort {
 
             OperationEntity savedOperationEntity = operationRepository.save(operationEntity);
 
-            return operationMapper.mapOperationEntitytoOperation(savedOperationEntity);
+            return operationMapper.mapOperationEntityToOperation(savedOperationEntity);
         } else {
             throw new EntityAlreadyExistsException(
                     "Operation with name: " + operationToCreate.getName() + " already exists.");
@@ -50,7 +50,7 @@ public class OperationPersistenceAdapter implements OperationOutputPort {
     public Operation findOperationById(Long operationId) {
         return operationRepository
                 .findById(operationId)
-                .map(operationMapper::mapOperationEntitytoOperation)
+                .map(operationMapper::mapOperationEntityToOperation)
                 .orElseThrow(() -> new EntityNotFoundException("Operation with id: " + operationId + " not found."));
     }
 
@@ -58,7 +58,7 @@ public class OperationPersistenceAdapter implements OperationOutputPort {
     public List<Operation> findOperationByPublicAccess() {
         return operationRepository.findByPublicAccess()
                 .stream()
-                .map(operationMapper::mapOperationEntitytoOperation)
+                .map(operationMapper::mapOperationEntityToOperation)
                 .collect(Collectors.toList());
     }
 
@@ -67,7 +67,7 @@ public class OperationPersistenceAdapter implements OperationOutputPort {
         return operationRepository
                 .findAll()
                 .stream()
-                .map(operationMapper::mapOperationEntitytoOperation)
+                .map(operationMapper::mapOperationEntityToOperation)
                 .collect(Collectors.toList());
     }
 
@@ -91,7 +91,7 @@ public class OperationPersistenceAdapter implements OperationOutputPort {
 
         operationEntity.setPermitAll(operationToUpdate.isPermitAll());
 
-        if (operationToUpdate.getModule().getId() != null) {
+        if (operationToUpdate.getModule() != null) {
             Long moduleId = operationToUpdate.getModule().getId();
 
             ModuleEntity moduleEntity = moduleRepository
@@ -103,6 +103,6 @@ public class OperationPersistenceAdapter implements OperationOutputPort {
 
         OperationEntity savedOperationEntity = operationRepository.save(operationEntity);
 
-        return operationMapper.mapOperationEntitytoOperation(savedOperationEntity);
+        return operationMapper.mapOperationEntityToOperation(savedOperationEntity);
     }
 }
