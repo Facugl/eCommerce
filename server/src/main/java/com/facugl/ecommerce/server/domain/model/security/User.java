@@ -1,9 +1,4 @@
-package com.facugl.ecommerce.server.domain.model.users;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import com.facugl.ecommerce.server.domain.model.roles.Role;
+package com.facugl.ecommerce.server.domain.model.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,23 +12,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class User {
-
     private Long id;
-
     private String firstName;
-
     private String lastName;
-
     private String username;
-
     private String password;
-
+    private String repeatedPassword;
     private String email;
-
     private String phoneNumber;
-
-    private Set<Role> roles = new HashSet<>();
-
-    private boolean admin;
-
+    private Role role;
 }
