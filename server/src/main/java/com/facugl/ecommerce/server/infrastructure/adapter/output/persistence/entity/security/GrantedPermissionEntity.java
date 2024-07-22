@@ -30,8 +30,7 @@ public class GrantedPermissionEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST,
-        CascadeType.REFRESH })
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "roles_id")
     private RoleEntity role;
 

@@ -13,7 +13,6 @@ import com.facugl.ecommerce.server.application.port.output.security.OperationOut
 import com.facugl.ecommerce.server.application.port.output.security.RoleOutputPort;
 import com.facugl.ecommerce.server.common.UseCase;
 import com.facugl.ecommerce.server.domain.model.security.GrantedPermission;
-import com.facugl.ecommerce.server.domain.model.security.GrantedPermission.GrantedPermissionBuilder;
 import com.facugl.ecommerce.server.domain.model.security.Operation;
 import com.facugl.ecommerce.server.domain.model.security.Role;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request.security.GrantedPermissionRequest;
@@ -57,19 +56,19 @@ public class GrantedPermissionService implements
 
     @Transactional
     public GrantedPermission mapGrantedPermissionRequestToGrantedPermission(
-            GrantedPermissionRequest grantedPermissionRequest) {
-        GrantedPermissionBuilder grantedPermission = GrantedPermission.builder();
+            GrantedPermissionRequest permissionToCreate) {
+        GrantedPermission grantedPermission = new GrantedPermission();
 
-        if (grantedPermissionRequest.getRoleId() != null) {
-            Role role = roleOutputPort.findRoleById(grantedPermissionRequest.getRoleId());
-            grantedPermission.role(role);
+        if (permissionToCreate.getRoleId() != null) {
+            Role role = roleOutputPort.findRoleById(permissionToCreate.getRoleId());
+            grantedPermission.setRole(role);
         }
 
-        if (grantedPermissionRequest.getOperationId() != null) {
-            Operation operation = operationOutputPort.findOperationById(grantedPermissionRequest.getOperationId());
-            grantedPermission.operation(operation);
+        if (permissionToCreate.getOperationId() != null) {
+            Operation operation = operationOutputPort.findOperationById(permissionToCreate.getOperationId());
+            grantedPermission.setOperation(operation);
         }
 
-        return grantedPermission.build();
+        return grantedPermission;
     }
 }
