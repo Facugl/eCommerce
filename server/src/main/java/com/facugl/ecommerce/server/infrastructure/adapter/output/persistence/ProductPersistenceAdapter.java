@@ -3,7 +3,7 @@ package com.facugl.ecommerce.server.infrastructure.adapter.output.persistence;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.facugl.ecommerce.server.application.port.output.ProductOutputPort;
+import com.facugl.ecommerce.server.application.port.output.products.ProductOutputPort;
 import com.facugl.ecommerce.server.common.PersistenceAdapter;
 import com.facugl.ecommerce.server.domain.model.products.Product;
 import com.facugl.ecommerce.server.domain.model.products.ProductStatus;
@@ -12,9 +12,9 @@ import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.gene
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.generic.ImageDuplicateException;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.categories.CategoryEntity;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.products.ProductEntity;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceProductMapper;
+import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.products.PersistenceProductMapper;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.CategoryRepository;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.ProductRepository;
+import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.products.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 
