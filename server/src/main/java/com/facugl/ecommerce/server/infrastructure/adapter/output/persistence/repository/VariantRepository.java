@@ -9,10 +9,8 @@ import org.springframework.data.repository.query.Param;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.variants.VariantEntity;
 
 public interface VariantRepository extends JpaRepository<VariantEntity, Long> {
+    @Query("SELECT COUNT(v) = 0 FROM VariantEntity v WHERE LOWER(v.name) = LOWER(:variantName)")
+    boolean isVariantNameUnique(@Param("variantName") String variantName);
 
-    @Query("SELECT COUNT(v) = 0 FROM VariantEntity v WHERE LOWER(v.name) = LOWER(:name)")
-    boolean isVariantNameUnique(@Param("name") String name);
-
-    Optional<VariantEntity> findByName(String name);
-
+    Optional<VariantEntity> findByName(String variantName);
 }

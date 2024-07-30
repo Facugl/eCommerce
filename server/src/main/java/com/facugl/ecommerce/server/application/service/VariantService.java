@@ -23,7 +23,6 @@ public class VariantService implements
         GetAllVariantsUseCase,
         DeleteVariantUseCase,
         UpdateVariantUseCase {
-
     private final VariantOutputPort variantOutputPort;
 
     @Transactional
@@ -34,14 +33,14 @@ public class VariantService implements
 
     @Transactional(readOnly = true)
     @Override
-    public Variant getVariantById(Long id) {
-        return variantOutputPort.findVariantById(id);
+    public Variant getVariantById(Long variantId) {
+        return variantOutputPort.findVariantById(variantId);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Variant getVariantByName(String name) {
-        return variantOutputPort.findVariantByName(name);
+    public Variant getVariantByName(String variantName) {
+        return variantOutputPort.findVariantByName(variantName);
     }
 
     @Transactional(readOnly = true)
@@ -52,14 +51,13 @@ public class VariantService implements
 
     @Transactional
     @Override
-    public void deleteVariantById(Long id) {
-        variantOutputPort.deleteVariantById(id);
+    public void deleteVariantById(Long variantId) {
+        variantOutputPort.deleteVariantById(variantId);
     }
 
     @Transactional
     @Override
-    public Variant updateVariant(Long id, Variant variantToUpdate) {
-        return variantOutputPort.updateVariant(id, variantToUpdate);
+    public Variant updateVariant(Long variantId, Variant variantToUpdate) {
+        return variantOutputPort.updateVariant(variantId, variantToUpdate);
     }
-
 }

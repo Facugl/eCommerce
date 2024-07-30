@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.facugl.ecommerce.server.application.port.input.variantsValues.CreateVariantValueUseCase;
 import com.facugl.ecommerce.server.application.port.input.variantsValues.DeleteVariantValueUseCase;
-import com.facugl.ecommerce.server.application.port.input.variantsValues.GetAllVariantsValuesByProductVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.variantsValues.GetAllVariantsValuesByVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.variantsValues.GetAllVariantsValuesUseCase;
 import com.facugl.ecommerce.server.application.port.input.variantsValues.GetVariantValueUseCase;
@@ -28,23 +27,21 @@ public class VariantValueService implements
         GetVariantValueUseCase,
         GetAllVariantsValuesUseCase,
         GetAllVariantsValuesByVariantUseCase,
-        GetAllVariantsValuesByProductVariantUseCase,
         UpdateVariantValueUseCase,
         DeleteVariantValueUseCase {
-
     private final VariantValueOutputPort variantValueOutputPort;
     private final VariantOutputPort variantOutputPort;
 
     @Transactional
     @Override
-    public VariantValue createVariantValue(VariantValue valueToCreate) {
-        return variantValueOutputPort.createVariantValue(valueToCreate);
+    public VariantValue createVariantValue(VariantValue variantValueToCreate) {
+        return variantValueOutputPort.createVariantValue(variantValueToCreate);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public VariantValue findVariantValueById(Long id) {
-        return variantValueOutputPort.findVariantValueById(id);
+    public VariantValue findVariantValueById(Long variantValueId) {
+        return variantValueOutputPort.findVariantValueById(variantValueId);
     }
 
     @Transactional(readOnly = true)
@@ -59,22 +56,16 @@ public class VariantValueService implements
         return variantValueOutputPort.getAllVariantsValuesByVariant(variantId);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     @Override
-    public List<VariantValue> getAllVariantsValuesByProductVariant(Long productVariantId) {
-        return variantValueOutputPort.getAllVariantsValuesByProductVariant(productVariantId);
+    public VariantValue updateVariantValue(Long variantValueId, VariantValue variantValueToUpdate) {
+        return variantValueOutputPort.updateVariantValue(variantValueId, variantValueToUpdate);
     }
 
     @Transactional
     @Override
-    public VariantValue updateVariantValue(Long id, VariantValue valueToUpdate) {
-        return variantValueOutputPort.updateVariantValue(id, valueToUpdate);
-    }
-
-    @Transactional
-    @Override
-    public void deleteVariantValueById(Long id) {
-        variantValueOutputPort.deleteVariantValueById(id);
+    public void deleteVariantValueById(Long variantValueId) {
+        variantValueOutputPort.deleteVariantValueById(variantValueId);
     }
 
     @Transactional
@@ -84,11 +75,9 @@ public class VariantValueService implements
 
         if (variantValue.getVariantId() != null) {
             Variant variant = variantOutputPort.findVariantById(variantValue.getVariantId());
-
             variantValueBuilder.variant(variant);
         }
 
         return variantValueBuilder.build();
     }
-
 }

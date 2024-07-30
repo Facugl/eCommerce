@@ -5,7 +5,5 @@ import java.util.List;
 import com.facugl.ecommerce.server.domain.model.variantsValues.VariantValue;
 
 public interface GetAllVariantsValuesByVariantUseCase {
-
     List<VariantValue> getAllVariantsValuesByVariant(Long variantId);
-
 }

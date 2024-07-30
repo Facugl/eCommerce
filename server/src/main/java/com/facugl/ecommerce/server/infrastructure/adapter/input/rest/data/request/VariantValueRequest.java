@@ -1,5 +1,7 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request;
 
+import java.io.Serializable;
+
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.variantsValues.CreateVariantValueValidationGroup;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.variantsValues.UpdateVariantValueValidationGroup;
 
@@ -16,15 +18,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VariantValueRequest {
+public class VariantValueRequest implements Serializable {
 
 	@NotBlank(message = "Name shouldn't be null or empty", groups = { CreateVariantValueValidationGroup.class })
-	@Size(min = 1, max = 20, message = "Name must be between 1 and 20 characters (inclusive)", groups = {
+	@Size(max = 20, message = "Name must be at most 20 characters", groups = {
 			CreateVariantValueValidationGroup.class, UpdateVariantValueValidationGroup.class })
 	private String value;
 
-	@NotNull(message = "Variant ID cannot be null", groups = {
-			CreateVariantValueValidationGroup.class })
+	@NotNull(message = "Variant ID cannot be null", groups = { CreateVariantValueValidationGroup.class })
 	@Positive(message = "Variant ID must be a positive number", groups = {
 			CreateVariantValueValidationGroup.class, UpdateVariantValueValidationGroup.class })
 	private Long variantId;

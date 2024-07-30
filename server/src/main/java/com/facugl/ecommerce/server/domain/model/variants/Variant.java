@@ -14,7 +14,6 @@ import lombok.Setter;
 public class Variant {
 
     private Long id;
-
     private String name;
 
     @Override

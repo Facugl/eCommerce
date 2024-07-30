@@ -11,12 +11,12 @@ import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.respon
 @Mapper(componentModel = "spring")
 public interface ApplicationVariantValueMapper {
 
-    VariantValueResponse mapVariantValueToVariantValueResponse(VariantValue value,
+    VariantValueResponse mapVariantValueToVariantValueResponse(VariantValue variantValue,
             @Context CycleAvoidingMappingContext cycleAvoidingMappingContext);
 
     @DoIgnore
-    default VariantValueResponse mapVariantValueToVariantValueResponse(VariantValue value) {
-        return mapVariantValueToVariantValueResponse(value, new CycleAvoidingMappingContext());
+    default VariantValueResponse mapVariantValueToVariantValueResponse(VariantValue variantValue) {
+        return mapVariantValueToVariantValueResponse(variantValue, new CycleAvoidingMappingContext());
     }
 
 }

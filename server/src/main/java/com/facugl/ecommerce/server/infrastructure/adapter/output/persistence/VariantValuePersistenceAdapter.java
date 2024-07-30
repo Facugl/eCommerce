@@ -5,9 +5,9 @@ import java.util.stream.Collectors;
 
 import com.facugl.ecommerce.server.application.port.output.VariantValueOutputPort;
 import com.facugl.ecommerce.server.common.PersistenceAdapter;
-import com.facugl.ecommerce.server.common.exception.generic.EntityAlreadyExistsException;
-import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundException;
 import com.facugl.ecommerce.server.domain.model.variantsValues.VariantValue;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.generic.EntityAlreadyExistsException;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.generic.EntityNotFoundException;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.variants.VariantEntity;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.variantsValues.VariantValueEntity;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceVariantValueMapper;
@@ -19,26 +19,24 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @PersistenceAdapter
 public class VariantValuePersistenceAdapter implements VariantValueOutputPort {
-
 	private final VariantValueRepository variantValueRepository;
 	private final VariantRepository variantRepository;
-
 	private final PersistenceVariantValueMapper variantValueMapper;
 
 	@Override
-	public VariantValue createVariantValue(VariantValue valueToCreate) {
-		Long variantId = valueToCreate.getVariant().getId();
+	public VariantValue createVariantValue(VariantValue variantValueToCreate) {
+		Long variantId = variantValueToCreate.getVariant().getId();
 
 		VariantEntity variantEntity = variantRepository
 				.findById(variantId)
 				.orElseThrow(() -> new EntityNotFoundException("Variant with id: " + variantId + " not found."));
 
-		List<VariantValueEntity> variantValueEntityList = variantValueRepository.findVariantValuesByVariant(variantId);
+		List<VariantValueEntity> variantsValues = variantValueRepository.findVariantValuesByVariant(variantId);
 
 		VariantValueEntity variantValueEntity = variantValueMapper
-				.mapVariantValueToVariantValueEntity(valueToCreate);
+				.mapVariantValueToVariantValueEntity(variantValueToCreate);
 
-		if (!variantValueEntityList.contains(variantValueEntity)) {
+		if (!variantsValues.contains(variantValueEntity)) {
 			variantValueEntity.setVariant(variantEntity);
 
 			variantValueRepository.save(variantValueEntity);
@@ -52,70 +50,55 @@ public class VariantValuePersistenceAdapter implements VariantValueOutputPort {
 	}
 
 	@Override
-	public VariantValue findVariantValueById(Long id) {
+	public VariantValue findVariantValueById(Long variantValueId) {
 		return variantValueRepository
-				.findVariantValueEntityWithVariantById(id)
-				.map(variantValueEntity -> variantValueMapper.mapVariantValueEntityToVariantValue(variantValueEntity))
-				.orElseThrow(() -> new EntityNotFoundException(
-						"Variant value with id: " + id + " not found."));
+				.findVariantValueWithVariantById(variantValueId)
+				.map(variantValueMapper::mapVariantValueEntityToVariantValue)
+				.orElseThrow(
+						() -> new EntityNotFoundException("Variant value with id: " + variantValueId + " not found."));
 	}
 
 	@Override
 	public VariantValue findVariantValueByValue(String value) {
 		return variantValueRepository
 				.findVariantValueByValue(value)
-				.map(variantValueEntity -> variantValueMapper.mapVariantValueEntityToVariantValue(variantValueEntity))
+				.map(variantValueMapper::mapVariantValueEntityToVariantValue)
 				.orElseThrow(() -> new EntityNotFoundException("Variant with value: " + value + " not found."));
 	}
 
 	@Override
 	public List<VariantValue> getAllVariantsValues() {
-		return variantValueRepository
-				.findAllVariantValueEntitiesWithVariant()
+		return variantValueRepository.findAllVariantValuesWithVariant()
 				.stream()
-				.map(variantValueEntity -> variantValueMapper.mapVariantValueEntityToVariantValue(variantValueEntity))
+				.map(variantValueMapper::mapVariantValueEntityToVariantValue)
 				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<VariantValue> getAllVariantsValuesByVariant(Long variantId) {
-		List<VariantValueEntity> variantValues = variantValueRepository.findVariantValuesByVariant(variantId);
-
-		return variantValues
+		return variantValueRepository.findVariantValuesByVariant(variantId)
 				.stream()
-				.map(variantValueEntity -> variantValueMapper.mapVariantValueEntityToVariantValue(variantValueEntity))
+				.map(variantValueMapper::mapVariantValueEntityToVariantValue)
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public List<VariantValue> getAllVariantsValuesByProductVariant(Long productVariantId) {
-		List<VariantValueEntity> variantValues = variantValueRepository
-				.findVariantValuesByProductVariant(productVariantId);
-
-		return variantValues
-				.stream()
-				.map(variantValueEntity -> variantValueMapper.mapVariantValueEntityToVariantValue(variantValueEntity))
-				.collect(Collectors.toList());
-	}
-
-	@Override
-	public VariantValue updateVariantValue(Long id, VariantValue valueToUpdate) {
+	public VariantValue updateVariantValue(Long variantValueId, VariantValue variantValueToUpdate) {
 		VariantValueEntity variantValueEntity = variantValueRepository
-				.findVariantValueEntityWithVariantById(id)
-				.orElseThrow(() -> new EntityNotFoundException(
-						"Variant value with id: " + id + " not found."));
+				.findVariantValueWithVariantById(variantValueId)
+				.orElseThrow(
+						() -> new EntityNotFoundException("Variant value with id: " + variantValueId + " not found."));
 
-		if (valueToUpdate.getValue() != null) {
-			variantValueEntity.setValue(valueToUpdate.getValue());
+		if (variantValueToUpdate.getValue() != null) {
+			variantValueEntity.setValue(variantValueToUpdate.getValue());
 		}
 
-		if (valueToUpdate.getVariant() != null) {
-			Long variantId = valueToUpdate.getVariant().getId();
+		if (variantValueToUpdate.getVariant() != null) {
+			Long variantId = variantValueToUpdate.getVariant().getId();
 
 			VariantEntity variantEntity = variantRepository
 					.findById(variantId)
-					.orElseThrow(() -> new EntityNotFoundException(
-							"Variant with name: " + variantId + " not found."));
+					.orElseThrow(() -> new EntityNotFoundException("Variant with id: " + variantId + " not found."));
 
 			variantValueEntity.setVariant(variantEntity);
 		}
@@ -126,13 +109,12 @@ public class VariantValuePersistenceAdapter implements VariantValueOutputPort {
 	}
 
 	@Override
-	public void deleteVariantValueById(Long id) {
+	public void deleteVariantValueById(Long variantValueId) {
 		VariantValueEntity variantValueEntity = variantValueRepository
-				.findVariantValueEntityWithVariantById(id)
-				.orElseThrow(() -> new EntityNotFoundException(
-						"Variant value with id: " + id + " not found."));
+				.findVariantValueWithVariantById(variantValueId)
+				.orElseThrow(
+						() -> new EntityNotFoundException("Variant value with id: " + variantValueId + " not found."));
 
 		variantValueRepository.delete(variantValueEntity);
 	}
-
 }

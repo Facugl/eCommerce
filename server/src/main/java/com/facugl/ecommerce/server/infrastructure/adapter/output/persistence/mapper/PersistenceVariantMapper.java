@@ -1,6 +1,5 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper;
 
-import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -13,7 +12,6 @@ public interface PersistenceVariantMapper {
 	@Mapping(target = "id", ignore = true)
 	VariantEntity mapVariantToVariantEntity(Variant variant);
 
-	@InheritInverseConfiguration
 	Variant mapVariantEntityToVariant(VariantEntity variantEntity);
 
 }
