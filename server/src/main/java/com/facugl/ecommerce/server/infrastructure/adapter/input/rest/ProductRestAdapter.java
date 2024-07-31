@@ -16,20 +16,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.facugl.ecommerce.server.application.mapper.ApplicationProductMapper;
-import com.facugl.ecommerce.server.application.mapper.ApplicationProductVariantMapper;
-import com.facugl.ecommerce.server.application.port.input.products.ActiveProductUseCase;
-import com.facugl.ecommerce.server.application.port.input.products.CreateProductUseCase;
-import com.facugl.ecommerce.server.application.port.input.products.DeleteProductUseCase;
-import com.facugl.ecommerce.server.application.port.input.products.GetAllProductsUseCase;
-import com.facugl.ecommerce.server.application.port.input.products.GetAllProductsVariantsByProductUseCase;
-import com.facugl.ecommerce.server.application.port.input.products.GetProductUseCase;
-import com.facugl.ecommerce.server.application.port.input.products.UpdateProductUseCase;
-import com.facugl.ecommerce.server.application.service.ProductService;
+import com.facugl.ecommerce.server.application.mapper.products.ApplicationProductMapper;
+import com.facugl.ecommerce.server.application.mapper.products.ApplicationProductVariantMapper;
+import com.facugl.ecommerce.server.application.port.input.products.products.ActiveProductUseCase;
+import com.facugl.ecommerce.server.application.port.input.products.products.CreateProductUseCase;
+import com.facugl.ecommerce.server.application.port.input.products.products.DeleteProductUseCase;
+import com.facugl.ecommerce.server.application.port.input.products.products.GetAllProductsUseCase;
+import com.facugl.ecommerce.server.application.port.input.products.products.GetProductUseCase;
+import com.facugl.ecommerce.server.application.port.input.products.products.UpdateProductUseCase;
+import com.facugl.ecommerce.server.application.port.input.products.productsVariants.GetAllProductsVariantsByProductUseCase;
+import com.facugl.ecommerce.server.application.service.products.ProductService;
 import com.facugl.ecommerce.server.common.WebAdapter;
 import com.facugl.ecommerce.server.domain.model.products.Product;
 import com.facugl.ecommerce.server.domain.model.products.ProductStatus;
-import com.facugl.ecommerce.server.domain.model.productsVariants.ProductVariant;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request.ProductRequest;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.ProductResponse;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.ProductVariantResponse;
@@ -45,7 +44,6 @@ import lombok.RequiredArgsConstructor;
 public class ProductRestAdapter {
 	private final ApplicationProductMapper productMapper;
 	private final ApplicationProductVariantMapper productVariantMapper;
-
 	private final CreateProductUseCase createProductUseCase;
 	private final GetProductUseCase getProductUseCase;
 	private final GetAllProductsUseCase getAllProductsUseCase;
@@ -53,7 +51,6 @@ public class ProductRestAdapter {
 	private final DeleteProductUseCase deleteProductUseCase;
 	private final UpdateProductUseCase updateProductUseCase;
 	private final ActiveProductUseCase activeProductUseCase;
-
 	private final ProductService productService;
 
 	@PostMapping
@@ -79,14 +76,14 @@ public class ProductRestAdapter {
 
 	@GetMapping
 	public ResponseEntity<List<ProductResponse>> getAllProducts() {
-		List<ProductResponse> productResponseList = getAllProductsUseCase.getAllProducts()
+		List<ProductResponse> products = getAllProductsUseCase.getAllProducts()
 				.stream()
 				.map(productMapper::mapProductToProductResponse)
 				.collect(Collectors.toList());
 
 		return ResponseEntity
 				.status(HttpStatus.OK)
-				.body(productResponseList);
+				.body(products);
 	}
 
 	@DeleteMapping("/{id}")
@@ -122,16 +119,14 @@ public class ProductRestAdapter {
 
 	@GetMapping("/{id}/productsVariants")
 	public ResponseEntity<List<ProductVariantResponse>> getAllProductsVariants(@PathVariable Long id) {
-		List<ProductVariant> productVariantList = getAllProductsVariantsByProductUseCase.getAllProductsVariantsByProduct(id);
-
-		List<ProductVariantResponse> productVariantResponseList = productVariantList
+		List<ProductVariantResponse> productsVariants = getAllProductsVariantsByProductUseCase
+				.getAllProductsVariantsByProduct(id)
 				.stream()
 				.map(productVariantMapper::mapProductVariantToProductVariantResponse)
 				.collect(Collectors.toList());
 
 		return ResponseEntity
 				.status(HttpStatus.OK)
-				.body(productVariantResponseList);
+				.body(productsVariants);
 	}
-
 }

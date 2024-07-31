@@ -10,16 +10,21 @@ import org.springframework.data.repository.query.Param;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.categories.CategoryEntity;
 
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
+    @Query("SELECT COUNT(c) = 0 FROM CategoryEntity c WHERE LOWER(c.name) = LOWER(:categoryName)")
+    boolean isCategoryNameUnique(@Param("categoryName") String categoryName);
 
-    @Query("SELECT COUNT(c) = 0 FROM CategoryEntity c WHERE LOWER(c.name) = LOWER(:name)")
-    boolean isCategoryNameUnique(@Param("name") String name);
+    @Query("SELECT c FROM CategoryEntity c LEFT JOIN FETCH c.parentCategory pc WHERE c.id = :categoryId")
+    Optional<CategoryEntity> findCategoryWithParentCategoryById(@Param("categoryId") Long categoryId);
 
-    Optional<CategoryEntity> findByName(String name);
+    @Query("SELECT c FROM CategoryEntity c LEFT JOIN FETCH c.parentCategory pc")
+    List<CategoryEntity> findAllCategoriesWithParentCategory();
+
+    Optional<CategoryEntity> findByName(String categoryName);
 
     List<CategoryEntity> findByStatusTrue();
 
     List<CategoryEntity> findByParentCategoryIsNull();
 
-    List<CategoryEntity> findByParentCategory_Id(Long parentId);
-
+    @Query("SELECT c FROM CategoryEntity c JOIN FETCH c.parentCategory pc WHERE pc.id = :parentCategoryId")
+    List<CategoryEntity> findAllSubCategoriesByParentCategory(@Param("parentCategoryId") Long parentCategoryId);
 }

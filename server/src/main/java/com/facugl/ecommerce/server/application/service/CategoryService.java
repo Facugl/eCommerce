@@ -9,9 +9,7 @@ import com.facugl.ecommerce.server.application.port.input.categories.ActiveCateg
 import com.facugl.ecommerce.server.application.port.input.categories.CreateCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllCategoriesUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllMainCategoriesUseCase;
-import com.facugl.ecommerce.server.application.port.input.categories.GetAllProductsByCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllSubCategoriesUseCase;
-import com.facugl.ecommerce.server.application.port.input.categories.GetAllVariantsByCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.UpdateCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.output.CategoryOutputPort;
@@ -19,8 +17,6 @@ import com.facugl.ecommerce.server.common.UseCase;
 import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.domain.model.categories.Category.CategoryBuilder;
 import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
-import com.facugl.ecommerce.server.domain.model.products.Product;
-import com.facugl.ecommerce.server.domain.model.variants.Variant;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request.CategoryRequest;
 
 import lombok.RequiredArgsConstructor;
@@ -34,15 +30,14 @@ public class CategoryService implements
         GetAllMainCategoriesUseCase,
         GetAllSubCategoriesUseCase,
         UpdateCategoryUseCase,
-        ActiveCategoryUseCase,
-        GetAllProductsByCategoryUseCase,
-        GetAllVariantsByCategoryUseCase {
-
+        ActiveCategoryUseCase {
     private final CategoryOutputPort categoryOutputPort;
 
     @Transactional
     @Override
     public Category createCategory(Category category) {
+        category.setStatus(CategoryStatus.ENABLED);
+        
         return categoryOutputPort.createCategory(category);
     }
 
@@ -91,30 +86,16 @@ public class CategoryService implements
     }
 
     @Transactional
-    public Category mapCategoryRequestToCategory(CategoryRequest category) {
-        CategoryBuilder categoryBuilder = Category.builder()
-                .name(category.getName())
-                .status(category.getStatus());
+    public Category mapCategoryRequestToCategory(CategoryRequest categoryToCreate) {
+        CategoryBuilder category = Category.builder()
+                .name(categoryToCreate.getName());
 
-        if (category.getParentCategoryId() != null) {
-            Category parentCategory = categoryOutputPort.findCategoryById(category.getParentCategoryId());
+        if (categoryToCreate.getParentCategoryId() != null) {
+            Category parentCategory = categoryOutputPort.findCategoryById(categoryToCreate.getParentCategoryId());
 
-            categoryBuilder.parentCategory(parentCategory);
+            category.parentCategory(parentCategory);
         }
 
-        return categoryBuilder.build();
+        return category.build();
     }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<Product> getAllProductsByCategory(Long categoryId) {
-        return categoryOutputPort.getAllProductsByCategory(categoryId);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<Variant> getAllVariantsByCategory(Long categoryId) {
-        return categoryOutputPort.getAllVariantsByCategory(categoryId);
-    }
-
 }

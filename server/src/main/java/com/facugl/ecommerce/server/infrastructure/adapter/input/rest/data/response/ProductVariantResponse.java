@@ -1,12 +1,8 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,38 +13,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductVariantResponse {
-
+public class ProductVariantResponse implements Serializable {
     private Long id;
-
     private String description;
-
     private List<String> images;
-
     private BigDecimal price;
-
     private String sku;
-
     private Integer stock;
-
-    @JsonBackReference
     private ProductResponse product;
-
-    @JsonManagedReference
-    private Set<VariantValueResponse> variantsValues = new HashSet<>();
-
-    @Override
-    public String toString() {
-        return "ProductVariantResponse{" +
-                "id=" + id +
-                ", description='" + description + '\'' +
-                ", images=" + images +
-                ", price=" + price +
-                ", sku='" + sku + '\'' +
-                ", stock=" + stock +
-                ", product='" + product.getName() + '\'' +
-                ", variantsValues=" + variantsValues.stream().map(VariantValueResponse::getValue).toList() +
-                "}";
-    }
-
 }

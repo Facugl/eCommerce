@@ -3,22 +3,17 @@ package com.facugl.ecommerce.server.application.port.output;
 import java.util.List;
 
 import com.facugl.ecommerce.server.domain.model.variants.Variant;
-import com.facugl.ecommerce.server.domain.model.variantsValues.VariantValue;
 
 public interface VariantOutputPort {
-
     Variant createVariant(Variant variantToCreate);
 
-    Variant findVariantById(Long id);
+    Variant findVariantById(Long variantId);
 
-    Variant findVariantByName(String name);
+    Variant findVariantByName(String variantName);
 
     List<Variant> getAllVariants();
 
-    void deleteVariantById(Long id);
+    void deleteVariantById(Long variantId);
 
-    Variant updateVariant(Long id, Variant variantToUpdate);
-
-    List<VariantValue> getAllVariantsValuesByVariant(Long variantId);
-
+    Variant updateVariant(Long variantId, Variant variantToUpdate);
 }

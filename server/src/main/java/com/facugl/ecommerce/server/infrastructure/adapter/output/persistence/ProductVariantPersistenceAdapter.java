@@ -1,35 +1,27 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.output.persistence;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.facugl.ecommerce.server.application.port.output.ProductVariantOutputPort;
+import com.facugl.ecommerce.server.application.port.output.products.ProductVariantOutputPort;
 import com.facugl.ecommerce.server.common.PersistenceAdapter;
-import com.facugl.ecommerce.server.common.exception.generic.EntityAlreadyExistsException;
-import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundException;
-import com.facugl.ecommerce.server.common.exception.generic.ImageDuplicateException;
-import com.facugl.ecommerce.server.domain.model.productsVariants.ProductVariant;
-import com.facugl.ecommerce.server.domain.model.variantsValues.VariantValue;
+import com.facugl.ecommerce.server.domain.model.products.ProductVariant;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.generic.EntityAlreadyExistsException;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.generic.EntityNotFoundException;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.generic.ImageDuplicateException;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.products.ProductEntity;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.productsVariants.ProductVariantEntity;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.variantsValues.VariantValueEntity;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceProductVariantMapper;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.ProductRepository;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.ProductVariantRepository;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.VariantValueRepository;
+import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.products.ProductVariantEntity;
+import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.products.PersistenceProductVariantMapper;
+import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.products.ProductRepository;
+import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.products.ProductVariantRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @PersistenceAdapter
 public class ProductVariantPersistenceAdapter implements ProductVariantOutputPort {
-
     private final ProductRepository productRepository;
     private final ProductVariantRepository productVariantRepository;
-    private final VariantValueRepository variantValueRepository;
-
     private final PersistenceProductVariantMapper productVariantMapper;
 
     @Override
@@ -40,30 +32,18 @@ public class ProductVariantPersistenceAdapter implements ProductVariantOutputPor
                 .findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Product with id: " + productId + " not found."));
 
-        List<ProductVariantEntity> productVariantEntitySet = productEntity.getProductsVariants();
+        List<ProductVariantEntity> productsVariantsEntities = productVariantRepository
+                .findProductsVariantsByProduct(productId);
 
         ProductVariantEntity productVariantEntity = productVariantMapper
                 .mapProductVariantToProductVariantEntity(productVariantToCreate);
 
-        if (!productVariantEntitySet.contains(productVariantEntity)) {
+        if (!productsVariantsEntities.contains(productVariantEntity)) {
             productVariantEntity.setProduct(productEntity);
 
-            Set<VariantValueEntity> variantValueEntitySet = new HashSet<>();
+            ProductVariantEntity savedProductVariant = productVariantRepository.save(productVariantEntity);
 
-            for (VariantValue variantValue : productVariantToCreate.getVariantsValues()) {
-                VariantValueEntity variantValueEntity = variantValueRepository
-                        .findById(variantValue.getId())
-                        .orElseThrow(() -> new EntityNotFoundException(
-                                "Product with id: " + variantValue.getId() + " not found."));
-
-                variantValueEntitySet.add(variantValueEntity);
-            }
-
-            productVariantEntity.setVariantsValues(variantValueEntitySet);
-
-            ProductVariantEntity productVariantSaved = productVariantRepository.save(productVariantEntity);
-
-            return productVariantMapper.mapProductVariantEntityToProductVariant(productVariantSaved);
+            return productVariantMapper.mapProductVariantEntityToProductVariant(savedProductVariant);
         } else {
             throw new EntityAlreadyExistsException(
                     "Product variant with id: " + productVariantEntity.getId() + " already exists in product with id: "
@@ -74,26 +54,46 @@ public class ProductVariantPersistenceAdapter implements ProductVariantOutputPor
     @Override
     public ProductVariant findProductVariantById(Long id) {
         return productVariantRepository
-                .findById(id)
-                .map(productVariantEntity -> productVariantMapper.mapProductVariantEntityToProductVariant(
-                        productVariantEntity))
+                .findProductVariantById(id)
+                .map(productVariantMapper::mapProductVariantEntityToProductVariant)
                 .orElseThrow(() -> new EntityNotFoundException("Product variant with id: " + id + " not found."));
     }
 
     @Override
     public List<ProductVariant> getAllProductsVariants() {
         return productVariantRepository
-                .findAll()
+                .findAllProductVariants()
                 .stream()
-                .map(productVariantEntity -> productVariantMapper.mapProductVariantEntityToProductVariant(
-                        productVariantEntity))
+                .map(productVariantMapper::mapProductVariantEntityToProductVariant)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductVariant> getAllProductsVariantsByProduct(Long productId) {
+        List<ProductVariantEntity> productVariantEntities = productVariantRepository
+                .findProductsVariantsByProduct(productId);
+
+        return productVariantEntities
+                .stream()
+                .map(productVariantMapper::mapProductVariantEntityToProductVariant)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductVariant> getAllProductsVariantsByVariantValue(Long variantValueId) {
+        List<ProductVariantEntity> productVariantEntities = productVariantRepository
+                .findProductsVariantsByVariantValue(variantValueId);
+
+        return productVariantEntities
+                .stream()
+                .map(productVariantMapper::mapProductVariantEntityToProductVariant)
                 .collect(Collectors.toList());
     }
 
     @Override
     public ProductVariant updateProductVariant(Long id, ProductVariant productVariantToUpdate) {
         ProductVariantEntity productVariantEntity = productVariantRepository
-                .findById(id)
+                .findProductVariantById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product variant with id: " + id + " not found."));
 
         if (productVariantToUpdate.getDescription() != null) {
@@ -108,7 +108,7 @@ public class ProductVariantPersistenceAdapter implements ProductVariantOutputPor
                 if (!productImages.contains(image)) {
                     productImages.add(image);
                 } else {
-                    throw new ImageDuplicateException("The image URL already exists in the list.");
+                    throw new ImageDuplicateException("The image URL already exists.");
                 }
             }
         }
@@ -135,17 +135,6 @@ public class ProductVariantPersistenceAdapter implements ProductVariantOutputPor
             productVariantEntity.setProduct(productEntity);
         }
 
-        if (productVariantToUpdate.getVariantsValues() != null) {
-            for (VariantValue variantValue : productVariantToUpdate.getVariantsValues()) {
-                VariantValueEntity variantValueEntity = variantValueRepository
-                        .findById(variantValue.getId())
-                        .orElseThrow(() -> new EntityNotFoundException(
-                                "Variant value with id: " + variantValue.getId() + " not found."));
-
-                productVariantEntity.getVariantsValues().add(variantValueEntity);
-            }
-        }
-
         ProductVariantEntity savedProductVariantEntity = productVariantRepository.save(productVariantEntity);
 
         return productVariantMapper.mapProductVariantEntityToProductVariant(savedProductVariantEntity);
@@ -154,12 +143,9 @@ public class ProductVariantPersistenceAdapter implements ProductVariantOutputPor
     @Override
     public void deleteProductVariantById(Long id) {
         ProductVariantEntity productVariantEntity = productVariantRepository
-                .findById(id)
+                .findProductVariantById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product variant with id: " + id + " not found."));
-
-        productVariantEntity.getVariantsValues().clear();
 
         productVariantRepository.delete(productVariantEntity);
     }
-
 }

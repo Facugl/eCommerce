@@ -1,13 +1,9 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.variantsValues;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.productsVariants.ProductVariantEntity;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.variants.VariantEntity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -15,7 +11,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -38,17 +33,12 @@ public class VariantValueEntity implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "value", unique = true, nullable = false)
+	@Column(unique = true, nullable = false)
 	private String value;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "variants_id", nullable = false)
 	private VariantEntity variant;
-
-	@Builder.Default
-	@ManyToMany(mappedBy = "variantsValues", cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST,
-			CascadeType.REFRESH })
-	private Set<ProductVariantEntity> productsVariants = new HashSet<>();
 
 	@Override
 	public int hashCode() {
@@ -79,16 +69,6 @@ public class VariantValueEntity implements Serializable {
 		} else if (!value.equals(other.value))
 			return false;
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "VariantValueEntity{" +
-				"id=" + id +
-				", value='" + value + '\'' +
-				", variant='" + variant + '\'' +
-				", productsVariants=" + productsVariants.stream().map(ProductVariantEntity::getId).toList() +
-				"}";
 	}
 
 }

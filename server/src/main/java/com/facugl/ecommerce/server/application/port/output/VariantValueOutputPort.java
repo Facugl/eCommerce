@@ -6,16 +6,18 @@ import com.facugl.ecommerce.server.domain.model.variantsValues.VariantValue;
 
 public interface VariantValueOutputPort {
 
-    VariantValue createVariantValue(VariantValue valueToCreate);
+    VariantValue createVariantValue(VariantValue variantValueToCreate);
 
-    VariantValue findVariantValueById(Long id);
+    VariantValue findVariantValueById(Long variantValueId);
 
-    VariantValue findVariantValueByValue(String name);
+    VariantValue findVariantValueByValue(String variantValue);
 
     List<VariantValue> getAllVariantsValues();
 
-    void deleteVariantValueById(Long id);
+    List<VariantValue> getAllVariantsValuesByVariant(Long variantId);
 
-    VariantValue updateVariantValue(Long id, VariantValue valueToUpdate);
+    void deleteVariantValueById(Long variantValueId);
+
+    VariantValue updateVariantValue(Long variantValueId, VariantValue variantValueToUpdate);
 
 }

@@ -6,16 +6,12 @@ import java.util.stream.Collectors;
 
 import com.facugl.ecommerce.server.application.port.output.CategoryOutputPort;
 import com.facugl.ecommerce.server.common.PersistenceAdapter;
-import com.facugl.ecommerce.server.common.exception.generic.EntityNameNotUniqueException;
-import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundException;
 import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
-import com.facugl.ecommerce.server.domain.model.products.Product;
-import com.facugl.ecommerce.server.domain.model.variants.Variant;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.generic.EntityNameNotUniqueException;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.generic.EntityNotFoundException;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.categories.CategoryEntity;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceCategoryMapper;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceProductMapper;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceVariantMapper;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.CategoryRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -23,22 +19,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @PersistenceAdapter
 public class CategoryPersistenceAdapter implements CategoryOutputPort {
-
 	private final CategoryRepository categoryRepository;
-
 	private final PersistenceCategoryMapper categoryMapper;
-	private final PersistenceProductMapper productMapper;
-	private final PersistenceVariantMapper variantMapper;
 
 	@Override
-	public boolean isCategoryNameUnique(String name) {
-		return !categoryRepository.findByName(name).isPresent();
-	}
-
-	@Override
-	public Category createCategory(Category category) {
-		if (categoryRepository.isCategoryNameUnique(category.getName())) {
-			CategoryEntity categoryEntity = categoryMapper.mapCategoryToCategoryEntity(category);
+	public Category createCategory(Category categoryToCreate) {
+		if (categoryRepository.isCategoryNameUnique(categoryToCreate.getName())) {
+			CategoryEntity categoryEntity = categoryMapper.mapCategoryToCategoryEntity(categoryToCreate);
 
 			if (categoryEntity.getParentCategory() != null && categoryEntity.getId() == null) {
 				CategoryEntity parentCategoryEntity = categoryRepository
@@ -49,8 +36,6 @@ public class CategoryPersistenceAdapter implements CategoryOutputPort {
 				categoryEntity.setParentCategory(parentCategoryEntity);
 			}
 
-			categoryEntity.setStatus(CategoryStatus.ENABLED);
-
 			CategoryEntity savedCategoryEntity = categoryRepository.save(categoryEntity);
 
 			return categoryMapper.mapCategoryEntityToCategory(savedCategoryEntity);
@@ -60,67 +45,65 @@ public class CategoryPersistenceAdapter implements CategoryOutputPort {
 	}
 
 	@Override
-	public Optional<Category> findCategoryByName(String name) {
+	public Optional<Category> findCategoryByName(String categoryName) {
 		return categoryRepository
-				.findByName(name)
-				.map(categoryEntity -> categoryMapper.mapCategoryEntityToCategory(categoryEntity));
+				.findByName(categoryName)
+				.map(categoryMapper::mapCategoryEntityToCategory);
 	}
 
 	@Override
-	public Category findCategoryById(Long id) {
+	public Category findCategoryById(Long categoryId) {
 		return categoryRepository
-				.findById(id)
-				.map(categoryEntity -> categoryMapper.mapCategoryEntityToCategory(categoryEntity))
-				.orElseThrow(() -> new EntityNotFoundException("Category with id: " + id + " not found."));
+				.findCategoryWithParentCategoryById(categoryId)
+				.map(categoryMapper::mapCategoryEntityToCategory)
+				.orElseThrow(() -> new EntityNotFoundException("Category with id: " + categoryId + " not found."));
 	}
 
 	@Override
 	public List<Category> getAllCategories() {
-		List<CategoryEntity> categoryEntityList = categoryRepository.findAll();
-
-		return categoryEntityList
+		return categoryRepository
+				.findAllCategoriesWithParentCategory()
 				.stream()
-				.map(categoryEntity -> categoryMapper.mapCategoryEntityToCategory(categoryEntity))
+				.map(categoryMapper::mapCategoryEntityToCategory)
 				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<Category> getAllMainCategories() {
-		List<CategoryEntity> categoryEntityList = categoryRepository.findByParentCategoryIsNull();
-
-		return categoryEntityList
+		return categoryRepository
+				.findByParentCategoryIsNull()
 				.stream()
-				.map(categoryEntity -> categoryMapper.mapCategoryEntityToCategory(categoryEntity))
+				.map(categoryMapper::mapCategoryEntityToCategory)
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public List<Category> getAllSubCategories(Long parentId) {
-		List<CategoryEntity> categoryEntityList = categoryRepository.findByParentCategory_Id(parentId);
-
-		return categoryEntityList
+	public List<Category> getAllSubCategories(Long parentCategoryId) {
+		return categoryRepository
+				.findAllSubCategoriesByParentCategory(parentCategoryId)
 				.stream()
-				.map(categoryEntity -> categoryMapper.mapCategoryEntityToCategory(categoryEntity))
+				.map(categoryMapper::mapCategoryEntityToCategory)
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public Category updateCategory(Long id, Category category) {
+	public Category updateCategory(Long parentCategoryId, Category categoryToUpdate) {
 		CategoryEntity categoryEntity = categoryRepository
-				.findById(id)
-				.orElseThrow(() -> new EntityNotFoundException("Category with id: " + id + " not found."));
+				.findCategoryWithParentCategoryById(parentCategoryId)
+				.orElseThrow(
+						() -> new EntityNotFoundException("Category with id: " + parentCategoryId + " not found."));
 
-		if (category.getName() != null) {
-			categoryEntity.setName(category.getName());
+		if (categoryToUpdate.getName() != null) {
+			categoryEntity.setName(categoryToUpdate.getName());
 		}
 
-		if (category.getParentCategory() != null) {
-			CategoryEntity parentCategory = categoryRepository
-					.findByName(category.getParentCategory().getName())
+		if (categoryToUpdate.getParentCategory() != null) {
+			CategoryEntity parentCategoryEntity = categoryRepository
+					.findByName(categoryToUpdate.getParentCategory().getName())
 					.orElseThrow(() -> new EntityNotFoundException(
-							"Category with name: " + category.getParentCategory().getName() + " not found."));
+							"Category with name: " + categoryToUpdate.getParentCategory().getName() + " not found."));
 
-			categoryEntity.setParentCategory(parentCategory);
+			categoryEntity.setParentCategory(parentCategoryEntity);
 		}
 
 		CategoryEntity savedCategoryEntity = categoryRepository.save(categoryEntity);
@@ -129,38 +112,13 @@ public class CategoryPersistenceAdapter implements CategoryOutputPort {
 	}
 
 	@Override
-	public void activeCategory(Long id, CategoryStatus status) {
+	public void activeCategory(Long categoryId, CategoryStatus status) {
 		CategoryEntity categoryEntity = categoryRepository
-				.findById(id)
-				.orElseThrow(() -> new EntityNotFoundException("Category with id: " + id + " not found."));
+				.findCategoryWithParentCategoryById(categoryId)
+				.orElseThrow(() -> new EntityNotFoundException("Category with id: " + categoryId + " not found."));
 
 		categoryEntity.setStatus(status);
 
 		categoryRepository.save(categoryEntity);
 	}
-
-	@Override
-	public List<Product> getAllProductsByCategory(Long categoryId) {
-		CategoryEntity categoryEntity = categoryRepository
-				.findById(categoryId)
-				.orElseThrow(() -> new EntityNotFoundException("Category with id: " + categoryId + " not found."));
-
-		return categoryEntity.getProducts()
-				.stream()
-				.map(productEntity -> productMapper.mapProductEntityToProduct(productEntity))
-				.collect(Collectors.toList());
-	}
-
-	@Override
-	public List<Variant> getAllVariantsByCategory(Long categoryId) {
-		CategoryEntity categoryEntity = categoryRepository
-				.findById(categoryId)
-				.orElseThrow(() -> new EntityNotFoundException("Category with id: " + categoryId + " not found."));
-
-		return categoryEntity.getVariants()
-				.stream()
-				.map(variantEntity -> variantMapper.mapVariantEntityToVariant(variantEntity))
-				.collect(Collectors.toList());
-	}
-
 }

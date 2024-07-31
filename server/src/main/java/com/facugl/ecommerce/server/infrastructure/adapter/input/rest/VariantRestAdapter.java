@@ -20,13 +20,11 @@ import com.facugl.ecommerce.server.application.mapper.ApplicationVariantValueMap
 import com.facugl.ecommerce.server.application.port.input.variants.CreateVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.variants.DeleteVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.variants.GetAllVariantsUseCase;
-import com.facugl.ecommerce.server.application.port.input.variants.GetAllVariantsValuesByVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.variants.GetVariantUseCase;
 import com.facugl.ecommerce.server.application.port.input.variants.UpdateVariantUseCase;
-import com.facugl.ecommerce.server.application.service.VariantService;
+import com.facugl.ecommerce.server.application.port.input.variantsValues.GetAllVariantsValuesByVariantUseCase;
 import com.facugl.ecommerce.server.common.WebAdapter;
 import com.facugl.ecommerce.server.domain.model.variants.Variant;
-import com.facugl.ecommerce.server.domain.model.variantsValues.VariantValue;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request.VariantRequest;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.VariantResponse;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.VariantValueResponse;
@@ -40,84 +38,80 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @WebAdapter
 public class VariantRestAdapter {
+	private final ApplicationVariantMapper variantMapper;
+	private final ApplicationVariantValueMapper variantValueMapper;
+	private final CreateVariantUseCase createVariantUseCase;
+	private final GetVariantUseCase getVariantUseCase;
+	private final GetAllVariantsUseCase getAllVariantsUseCase;
+	private final GetAllVariantsValuesByVariantUseCase getAllVariantsValuesByVariantUseCase;
+	private final DeleteVariantUseCase deleteVariantUseCase;
+	private final UpdateVariantUseCase updateVariantUseCase;
 
-    private final ApplicationVariantMapper variantMapper;
-    private final ApplicationVariantValueMapper variantValueMapper;
+	@PostMapping
+	public ResponseEntity<VariantResponse> createVariant(
+			@RequestBody @Validated(CreateVariantValidationGroup.class) VariantRequest variantToCreate) {
+		Variant variant = variantMapper.mapVariantRequestToVariant(variantToCreate);
 
-    private final CreateVariantUseCase createVariantUseCase;
-    private final GetVariantUseCase getVariantUseCase;
-    private final GetAllVariantsUseCase getAllVariantsUseCase;
-    private final GetAllVariantsValuesByVariantUseCase getAllVariantsValuesByVariantUseCase;
-    private final DeleteVariantUseCase deleteVariantUseCase;
-    private final UpdateVariantUseCase updateVariantUseCase;
+		Variant createdVariant = createVariantUseCase.createVariant(variant);
 
-    private final VariantService variantService;
+		return ResponseEntity
+				.status(HttpStatus.CREATED)
+				.body(variantMapper.mapVariantToVariantResponse(createdVariant));
+	}
 
-    @PostMapping
-    public ResponseEntity<VariantResponse> createVariant(
-            @RequestBody @Validated(CreateVariantValidationGroup.class) VariantRequest variantToCreate) {
-        Variant variant = variantService.mapVariantRequestToVariant(variantToCreate);
+	@GetMapping("/{id}")
+	public ResponseEntity<VariantResponse> getOneVariant(@PathVariable Long id) {
+		Variant variant = getVariantUseCase.getVariantById(id);
 
-        Variant createdVariant = createVariantUseCase.createVariant(variant);
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(variantMapper.mapVariantToVariantResponse(variant));
+	}
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(variantMapper.mapVariantToVariantResponse(createdVariant));
-    }
+	@GetMapping
+	public ResponseEntity<List<VariantResponse>> getAllVariants() {
+		List<VariantResponse> variants = getAllVariantsUseCase.getAllVariants()
+				.stream()
+				.map(variantMapper::mapVariantToVariantResponse)
+				.collect(Collectors.toList());
 
-    @GetMapping("/{id}")
-    public ResponseEntity<VariantResponse> getOneVariant(@PathVariable Long id) {
-        Variant variant = getVariantUseCase.getVariantById(id);
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(variants);
+	}
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(variantMapper.mapVariantToVariantResponse(variant));
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteVariant(@PathVariable Long id) {
+		deleteVariantUseCase.deleteVariantById(id);
 
-    @GetMapping
-    public ResponseEntity<List<VariantResponse>> getAllVariants() {
-        List<Variant> variantList = getAllVariantsUseCase.getAllVariants();
+		return ResponseEntity
+				.status(HttpStatus.NO_CONTENT)
+				.build();
+	}
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(variantList
-                        .stream()
-                        .map(variantMapper::mapVariantToVariantResponse)
-                        .collect(Collectors.toList()));
-    }
+	@PutMapping("/{id}")
+	public ResponseEntity<VariantResponse> updateVariant(
+			@PathVariable Long id,
+			@RequestBody @Validated(UpdateVariantValidationGroup.class) VariantRequest variantToUpdate) {
+		Variant variant = variantMapper.mapVariantRequestToVariant(variantToUpdate);
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVariant(@PathVariable Long id) {
-        deleteVariantUseCase.deleteVariantById(id);
+		Variant updatedVariant = updateVariantUseCase.updateVariant(id, variant);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(variantMapper.mapVariantToVariantResponse(updatedVariant));
+	}
 
-    @PutMapping("/{id}")
-    public ResponseEntity<VariantResponse> updateVariant(
-            @PathVariable Long id,
-            @RequestBody @Validated(UpdateVariantValidationGroup.class) VariantRequest variantToUpdate) {
-        Variant variant = variantService.mapVariantRequestToVariant(variantToUpdate);
+	@GetMapping("/{id}/values")
+	public ResponseEntity<List<VariantValueResponse>> getAllVariantValues(@PathVariable Long id) {
+		List<VariantValueResponse> variantsValues = getAllVariantsValuesByVariantUseCase
+				.getAllVariantsValuesByVariant(id)
+				.stream()
+				.map(variantValueMapper::mapVariantValueToVariantValueResponse)
+				.collect(Collectors.toList());
 
-        Variant updatedVariant = updateVariantUseCase.updateVariant(id, variant);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(variantMapper.mapVariantToVariantResponse(updatedVariant));
-    }
-
-    @GetMapping("/{id}/values")
-    public ResponseEntity<List<VariantValueResponse>> getAllVariantValues(@PathVariable Long id) {
-        List<VariantValue> variantValueList = getAllVariantsValuesByVariantUseCase.getAllVariantsValuesByVariant(id);
-
-        List<VariantValueResponse> variantValueResponseList = variantValueList
-                .stream()
-                .map(variantValueMapper::mapVariantValueToVariantValueResponse)
-                .collect(Collectors.toList());
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(variantValueResponseList);
-    }
-
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(variantsValues);
+	}
 }

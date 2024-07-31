@@ -5,9 +5,7 @@ import java.util.Optional;
 import com.facugl.ecommerce.server.domain.model.categories.Category;
 
 public interface GetCategoryUseCase {
+    Category getCategoryById(Long CategoryId);
 
-    Category getCategoryById(Long id);
-
-    Optional<Category> getCategoryByName(String name);
-
+    Optional<Category> getCategoryByName(String categoryName);
 }

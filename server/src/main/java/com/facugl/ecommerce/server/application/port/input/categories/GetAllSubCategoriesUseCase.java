@@ -5,5 +5,5 @@ import java.util.List;
 import com.facugl.ecommerce.server.domain.model.categories.Category;
 
 public interface GetAllSubCategoriesUseCase {
-    List<Category> getAllSubCategories(Long parentId);
+    List<Category> getAllSubCategories(Long parentCategoryId);
 }

@@ -1,9 +1,5 @@
 package com.facugl.ecommerce.server.domain.model.variantsValues;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import com.facugl.ecommerce.server.domain.model.productsVariants.ProductVariant;
 import com.facugl.ecommerce.server.domain.model.variants.Variant;
 
 import lombok.AllArgsConstructor;
@@ -18,24 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class VariantValue {
-
     private Long id;
-
     private String value;
-
     private Variant variant;
-
-    @Builder.Default
-    private Set<ProductVariant> productsVariants = new HashSet<>();
-
-    @Override
-    public String toString() {
-        return "VariantValue{" +
-                "id=" + id +
-                ", value='" + value + '\'' +
-                ", variant='" + variant.getName() + '\'' +
-                ", productsVariants=" + productsVariants.stream().map(ProductVariant::getId).toList() +
-                "}";
-    }
-
 }

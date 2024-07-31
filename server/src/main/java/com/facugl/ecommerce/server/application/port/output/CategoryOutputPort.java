@@ -5,31 +5,21 @@ import java.util.Optional;
 
 import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
-import com.facugl.ecommerce.server.domain.model.products.Product;
-import com.facugl.ecommerce.server.domain.model.variants.Variant;
 
-public interface CategoryOutputPort {
-
-    boolean isCategoryNameUnique(String name);
-
-    Category findCategoryById(Long id);
-
-    Optional<Category> findCategoryByName(String name);
-
+public interface CategoryOutputPort {    
+    Category createCategory(Category categoryToCreate);
+    
+    Category findCategoryById(Long categoryId);
+    
+    Optional<Category> findCategoryByName(String categoryName);
+    
     List<Category> getAllCategories();
-
-    Category createCategory(Category category);
 
     List<Category> getAllMainCategories();
 
-    List<Category> getAllSubCategories(Long parentId);
+    List<Category> getAllSubCategories(Long parentCategoryId);
 
-    Category updateCategory(Long id, Category category);
+    Category updateCategory(Long categoryId, Category categoryToUpdate);
 
-    void activeCategory(Long id, CategoryStatus status);
-
-    List<Product> getAllProductsByCategory(Long categoryId);
-
-    List<Variant> getAllVariantsByCategory(Long categoryId);
-
+    void activeCategory(Long categoryId, CategoryStatus status);
 }

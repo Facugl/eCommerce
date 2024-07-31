@@ -1,14 +1,11 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.products;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.facugl.ecommerce.server.domain.model.products.ProductStatus;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.categories.CategoryEntity;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.productsVariants.ProductVariantEntity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,7 +16,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -41,26 +37,22 @@ public class ProductEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String name;
 
-    @Column(name = "description", length = 5000)
+    @Column(length = 5000)
     private String description;
 
-    @Column(name = "images", nullable = false)
+    @Column(nullable = false)
     private List<String> images;
 
-    @Column(name = "status", nullable = false)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categories_id", nullable = false)
     private CategoryEntity category;
-
-    @Builder.Default
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product", orphanRemoval = true)
-    private List<ProductVariantEntity> productsVariants = new ArrayList<>();
 
     @Override
     public int hashCode() {
@@ -100,9 +92,8 @@ public class ProductEntity implements Serializable {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", images=" + images +
-                ", status=" + status +
-                ", category='" + category + '\'' +
-                ", productsVariants=" + productsVariants.stream().map(ProductVariantEntity::getId).toList() +
+                ", status='" + status + '\'' +
+                ", category=" + category +
                 "}";
     }
 

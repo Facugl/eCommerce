@@ -16,27 +16,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.facugl.ecommerce.server.application.mapper.ApplicationCategoryMapper;
-import com.facugl.ecommerce.server.application.mapper.ApplicationProductMapper;
-import com.facugl.ecommerce.server.application.mapper.ApplicationVariantMapper;
+import com.facugl.ecommerce.server.application.mapper.products.ApplicationProductMapper;
 import com.facugl.ecommerce.server.application.port.input.categories.ActiveCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.CreateCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllCategoriesUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllMainCategoriesUseCase;
-import com.facugl.ecommerce.server.application.port.input.categories.GetAllProductsByCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllSubCategoriesUseCase;
-import com.facugl.ecommerce.server.application.port.input.categories.GetAllVariantsByCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.UpdateCategoryUseCase;
+import com.facugl.ecommerce.server.application.port.input.products.products.GetAllProductsByCategoryUseCase;
 import com.facugl.ecommerce.server.application.service.CategoryService;
 import com.facugl.ecommerce.server.common.WebAdapter;
 import com.facugl.ecommerce.server.domain.model.categories.Category;
 import com.facugl.ecommerce.server.domain.model.categories.CategoryStatus;
-import com.facugl.ecommerce.server.domain.model.products.Product;
-import com.facugl.ecommerce.server.domain.model.variants.Variant;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request.CategoryRequest;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.CategoryResponse;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.ProductResponse;
-import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.VariantResponse;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.categories.CreateCategoryValidationGroup;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.categories.UpdateCategoryValidationGroup;
 
@@ -47,11 +42,8 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/categories")
 public class CategoryRestAdapter {
-
 	private final ApplicationCategoryMapper categoryMapper;
 	private final ApplicationProductMapper productMapper;
-	private final ApplicationVariantMapper variantMapper;
-
 	private final CreateCategoryUseCase createCategoryUseCase;
 	private final GetCategoryUseCase getCategoryUseCase;
 	private final GetAllCategoriesUseCase getAllCategoriesUseCase;
@@ -60,8 +52,6 @@ public class CategoryRestAdapter {
 	private final UpdateCategoryUseCase updateCategoryUseCase;
 	private final ActiveCategoryUseCase activeCategoryUseCase;
 	private final GetAllProductsByCategoryUseCase getAllProductsByCategoryUseCase;
-	private final GetAllVariantsByCategoryUseCase getAllVariantsByCategoryUseCase;
-
 	private final CategoryService categoryService;
 
 	@PostMapping
@@ -145,30 +135,13 @@ public class CategoryRestAdapter {
 
 	@GetMapping("/{id}/products")
 	public ResponseEntity<List<ProductResponse>> getAllProducts(@PathVariable Long id) {
-		List<Product> productList = getAllProductsByCategoryUseCase.getAllProductsByCategory(id);
-
-		List<ProductResponse> productResponseList = productList
+		List<ProductResponse> products = getAllProductsByCategoryUseCase.getAllProductsByCategory(id)
 				.stream()
 				.map(productMapper::mapProductToProductResponse)
 				.collect(Collectors.toList());
 
 		return ResponseEntity
 				.status(HttpStatus.OK)
-				.body(productResponseList);
+				.body(products);
 	}
-
-	@GetMapping("/{id}/variants")
-	public ResponseEntity<List<VariantResponse>> getAllVariants(@PathVariable Long id) {
-		List<Variant> variantList = getAllVariantsByCategoryUseCase.getAllVariantsByCategory(id);
-
-		List<VariantResponse> variantResponseList = variantList
-				.stream()
-				.map(variantMapper::mapVariantToVariantResponse)
-				.collect(Collectors.toList());
-
-		return ResponseEntity
-				.status(HttpStatus.OK)
-				.body(variantResponseList);
-	}
-
 }

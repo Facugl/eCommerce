@@ -1,35 +1,29 @@
 package com.facugl.ecommerce.server.infrastructure.adapter.output.persistence;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.facugl.ecommerce.server.application.port.output.ProductOutputPort;
+import com.facugl.ecommerce.server.application.port.output.products.ProductOutputPort;
 import com.facugl.ecommerce.server.common.PersistenceAdapter;
-import com.facugl.ecommerce.server.common.exception.generic.EntityAlreadyExistsException;
-import com.facugl.ecommerce.server.common.exception.generic.EntityNotFoundException;
-import com.facugl.ecommerce.server.common.exception.generic.ImageDuplicateException;
 import com.facugl.ecommerce.server.domain.model.products.Product;
 import com.facugl.ecommerce.server.domain.model.products.ProductStatus;
-import com.facugl.ecommerce.server.domain.model.productsVariants.ProductVariant;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.generic.EntityAlreadyExistsException;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.generic.EntityNotFoundException;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.generic.ImageDuplicateException;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.categories.CategoryEntity;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.entity.products.ProductEntity;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceProductMapper;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.PersistenceProductVariantMapper;
+import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.mapper.products.PersistenceProductMapper;
 import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.CategoryRepository;
-import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.ProductRepository;
+import com.facugl.ecommerce.server.infrastructure.adapter.output.persistence.repository.products.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @PersistenceAdapter
 public class ProductPersistenceAdapter implements ProductOutputPort {
-
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-
     private final PersistenceProductMapper productMapper;
-    private final PersistenceProductVariantMapper productVariantMapper;
 
     @Override
     public Product createProduct(Product productToCreate) {
@@ -39,14 +33,12 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
                 .findById(categoryId)
                 .orElseThrow(() -> new EntityNotFoundException("Category with id: " + categoryId + " not found."));
 
-        Set<ProductEntity> productEntities = categoryEntity.getProducts();
+        List<ProductEntity> products = productRepository.findProductsByCategoryId(categoryId);
 
         ProductEntity productEntity = productMapper.mapProductToProductEntity(productToCreate);
 
-        if (!productEntities.contains(productEntity)) {
+        if (!products.contains(productEntity)) {
             productEntity.setCategory(categoryEntity);
-
-            productEntity.setStatus(ProductStatus.ENABLED);
 
             ProductEntity createdProduct = productRepository.save(productEntity);
 
@@ -58,51 +50,43 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
     }
 
     @Override
-    public Product findProductById(Long id) {
+    public Product findProductById(Long productId) {
         return productRepository
-                .findById(id)
-                .map(productEntity -> productMapper.mapProductEntityToProduct(productEntity))
-                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
+                .findProductWithCategoryById(productId)
+                .map(productMapper::mapProductEntityToProduct)
+                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + productId + " not found."));
     }
 
     @Override
     public List<Product> getAllProducts() {
-        List<ProductEntity> productEntityList = productRepository.findAll();
-
-        return productEntityList
+        return productRepository.findAllProductsWithCategory()
                 .stream()
-                .map(product -> productMapper.mapProductEntityToProduct(product))
+                .map(productMapper::mapProductEntityToProduct)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ProductVariant> getAllProductsVariantsByProduct(Long productId) {
+    public List<Product> getAllProductsByCategory(Long categoryId) {
+        return productRepository.findProductsByCategoryId(categoryId)
+                .stream()
+                .map(productMapper::mapProductEntityToProduct)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteProductById(Long productId) {
         ProductEntity productEntity = productRepository
-                .findById(productId)
+                .findProductWithCategoryById(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Product with id: " + productId + " not found."));
-
-        return productEntity
-                .getProductsVariants()
-                .stream()
-                .map(productVariantEntity -> productVariantMapper.mapProductVariantEntityToProductVariant(
-                        productVariantEntity))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void deleteProductById(Long id) {
-        ProductEntity productEntity = productRepository
-                .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
 
         productRepository.delete(productEntity);
     }
 
     @Override
-    public Product updateProduct(Long id, Product productToUpdate) {
+    public Product updateProduct(Long productId, Product productToUpdate) {
         ProductEntity productEntity = productRepository
-                .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
+                .findProductWithCategoryById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + productId + " not found."));
 
         if (productToUpdate.getName() != null) {
             productEntity.setName(productToUpdate.getName());
@@ -120,7 +104,7 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
                 if (!productImages.contains(image)) {
                     productImages.add(image);
                 } else {
-                    throw new ImageDuplicateException("The image URL already exists in the list.");
+                    throw new ImageDuplicateException("The image URL: " + image + " already exists in the list.");
                 }
             }
         }
@@ -142,14 +126,13 @@ public class ProductPersistenceAdapter implements ProductOutputPort {
     }
 
     @Override
-    public void activeProduct(Long id, ProductStatus status) {
+    public void activeProduct(Long productId, ProductStatus status) {
         ProductEntity productEntity = productRepository
-                .findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + id + " not found."));
+                .findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Product with id: " + productId + " not found."));
 
         productEntity.setStatus(status);
 
         productRepository.save(productEntity);
     }
-
 }

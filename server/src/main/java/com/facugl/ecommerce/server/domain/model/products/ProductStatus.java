@@ -11,5 +11,4 @@ public enum ProductStatus {
     public static ProductStatus fromJson(@JsonProperty("status") String status) {
         return valueOf(status);
     }
-    
 }

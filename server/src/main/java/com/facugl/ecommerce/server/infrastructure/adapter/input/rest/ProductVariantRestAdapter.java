@@ -3,8 +3,6 @@ package com.facugl.ecommerce.server.infrastructure.adapter.input.rest;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -17,57 +15,46 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.facugl.ecommerce.server.application.mapper.ApplicationProductVariantMapper;
-import com.facugl.ecommerce.server.application.port.input.productsVariants.CreateProductVariantUseCase;
-import com.facugl.ecommerce.server.application.port.input.productsVariants.DeleteProductVariantUseCase;
-import com.facugl.ecommerce.server.application.port.input.productsVariants.GetAllProductVariantsUseCase;
-import com.facugl.ecommerce.server.application.port.input.productsVariants.GetProductVariantUseCase;
-import com.facugl.ecommerce.server.application.port.input.productsVariants.UpdateProductVariantUseCase;
-import com.facugl.ecommerce.server.application.service.ProductVariantService;
+import com.facugl.ecommerce.server.application.mapper.products.ApplicationProductVariantMapper;
+import com.facugl.ecommerce.server.application.port.input.products.productsVariants.CreateProductVariantUseCase;
+import com.facugl.ecommerce.server.application.port.input.products.productsVariants.DeleteProductVariantUseCase;
+import com.facugl.ecommerce.server.application.port.input.products.productsVariants.GetAllProductsVariantsUseCase;
+import com.facugl.ecommerce.server.application.port.input.products.productsVariants.GetProductVariantUseCase;
+import com.facugl.ecommerce.server.application.port.input.products.productsVariants.UpdateProductVariantUseCase;
+import com.facugl.ecommerce.server.application.service.products.ProductVariantService;
 import com.facugl.ecommerce.server.common.WebAdapter;
-import com.facugl.ecommerce.server.domain.model.productsVariants.ProductVariant;
+import com.facugl.ecommerce.server.domain.model.products.ProductVariant;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.request.ProductVariantRequest;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.data.response.ProductVariantResponse;
-import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.productsVariants.CreateProductVariantValidationGroup;
-import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.productsVariants.UpdateProductVariantValidationGroup;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.products.CreateProductVariantValidationGroup;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.validation.groups.products.UpdateProductVariantValidationGroup;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @WebAdapter
 @RestController
-@RequestMapping("/productsVariants")
+@RequestMapping("/products-variants")
 public class ProductVariantRestAdapter {
-
 	private final CreateProductVariantUseCase createProductVariantUseCase;
 	private final GetProductVariantUseCase getProductVariantUseCase;
-	private final GetAllProductVariantsUseCase getAllProductVariantsUseCase;
+	private final GetAllProductsVariantsUseCase getAllProductVariantsUseCase;
 	private final UpdateProductVariantUseCase updateProductVariantUseCase;
 	private final DeleteProductVariantUseCase deleteProductVariantUseCase;
-
 	private final ApplicationProductVariantMapper productVariantMapper;
-
 	private final ProductVariantService productVariantService;
-
-	private static final Logger logger = LoggerFactory.getLogger(ProductVariantRestAdapter.class);
 
 	@PostMapping
 	public ResponseEntity<ProductVariantResponse> createProductVariant(
 			@Validated(CreateProductVariantValidationGroup.class) @RequestBody ProductVariantRequest productVariantToCreate) {
 		ProductVariant productVariant = productVariantService
 				.mapProductVariantRequestToProductVariant(productVariantToCreate);
-		logger.info("Este es el productVariant mapeado: {}", productVariant);
 
 		ProductVariant createdProductVariant = createProductVariantUseCase.createProductVariant(productVariant);
-		logger.info("Este es el createdProductVariant devuelto del useCase: {}", createdProductVariant);
-
-		ProductVariantResponse productVariantResponse = productVariantMapper
-				.mapProductVariantToProductVariantResponse(createdProductVariant);
-		logger.info("Este es el productVariantResponse mapeado y enviado al body: {}", productVariantResponse);
 
 		return ResponseEntity
 				.status(HttpStatus.CREATED)
-				.body(productVariantResponse);
+				.body(productVariantMapper.mapProductVariantToProductVariantResponse(createdProductVariant));
 	}
 
 	@GetMapping("/{id}")
@@ -81,7 +68,7 @@ public class ProductVariantRestAdapter {
 
 	@GetMapping
 	public ResponseEntity<List<ProductVariantResponse>> getAllProductsVariants() {
-		List<ProductVariantResponse> productVariantResponseList = getAllProductVariantsUseCase
+		List<ProductVariantResponse> productsVariants = getAllProductVariantsUseCase
 				.getAllProductsVariants()
 				.stream()
 				.map(productVariantMapper::mapProductVariantToProductVariantResponse)
@@ -89,7 +76,7 @@ public class ProductVariantRestAdapter {
 
 		return ResponseEntity
 				.status(HttpStatus.OK)
-				.body(productVariantResponseList);
+				.body(productsVariants);
 	}
 
 	@PutMapping("/{id}")
@@ -112,9 +99,6 @@ public class ProductVariantRestAdapter {
 	public ResponseEntity<Void> deleteProductVariant(@PathVariable Long id) {
 		deleteProductVariantUseCase.deleteProductVariantById(id);
 
-		return ResponseEntity
-				.status(HttpStatus.NO_CONTENT)
-				.build();
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
-
 }
