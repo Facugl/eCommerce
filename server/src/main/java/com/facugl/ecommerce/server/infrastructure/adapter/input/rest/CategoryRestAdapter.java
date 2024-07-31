@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.facugl.ecommerce.server.application.mapper.ApplicationCategoryMapper;
-import com.facugl.ecommerce.server.application.mapper.ApplicationProductMapper;
+import com.facugl.ecommerce.server.application.mapper.products.ApplicationProductMapper;
 import com.facugl.ecommerce.server.application.port.input.categories.ActiveCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.CreateCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllCategoriesUseCase;
@@ -24,7 +24,7 @@ import com.facugl.ecommerce.server.application.port.input.categories.GetAllMainC
 import com.facugl.ecommerce.server.application.port.input.categories.GetAllSubCategoriesUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.GetCategoryUseCase;
 import com.facugl.ecommerce.server.application.port.input.categories.UpdateCategoryUseCase;
-import com.facugl.ecommerce.server.application.port.input.products.GetAllProductsByCategoryUseCase;
+import com.facugl.ecommerce.server.application.port.input.products.products.GetAllProductsByCategoryUseCase;
 import com.facugl.ecommerce.server.application.service.CategoryService;
 import com.facugl.ecommerce.server.common.WebAdapter;
 import com.facugl.ecommerce.server.domain.model.categories.Category;
