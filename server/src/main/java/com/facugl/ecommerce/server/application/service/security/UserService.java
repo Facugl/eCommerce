@@ -1,6 +1,7 @@
 package com.facugl.ecommerce.server.application.service.security;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +18,7 @@ import com.facugl.ecommerce.server.application.port.output.security.UserOutputPo
 import com.facugl.ecommerce.server.common.UseCase;
 import com.facugl.ecommerce.server.domain.model.security.Role;
 import com.facugl.ecommerce.server.domain.model.security.User;
+import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.generic.InvalidEmailException;
 import com.facugl.ecommerce.server.infrastructure.adapter.input.rest.advice.generic.InvalidPasswordException;
 
 import lombok.RequiredArgsConstructor;
@@ -40,23 +42,39 @@ public class UserService implements
     @Override
     public User createUser(User userToCreate) {
         validatePassword(userToCreate);
-
+        validateEmail(userToCreate);        
         Role role = roleOutputPort.findRoleByName(defaultRole);
-
+        
         userToCreate.setRole(role);
         userToCreate.setPassword(passwordEncoder.encode(userToCreate.getPassword()));
+        userToCreate.setEmail(userToCreate.getEmail().trim().toLowerCase());
 
         return userOutputPort.createUser(userToCreate);
     }
 
     private void validatePassword(User user) {
         if (!StringUtils.hasText(user.getPassword()) || !StringUtils.hasText(user.getRepeatedPassword())) {
-            throw new InvalidPasswordException("Passwords don't match.");
+            throw new InvalidPasswordException("Passwords don't match!");
         }
 
         if (!user.getPassword().equals(user.getRepeatedPassword())) {
-            throw new InvalidPasswordException("Passwords don't match.");
+            throw new InvalidPasswordException("Passwords don't match!");
         }
+    }
+
+    private void validateEmail(User userToCreate) {
+        if (!isValidEmail(userToCreate.getEmail())) {
+            throw new InvalidEmailException("Invalid email format!");            
+        }        
+    }
+
+    private static boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        Pattern pat = Pattern.compile(emailRegex);
+
+        if (email == null) return false;
+        
+        return pat.matcher(email).matches();
     }
 
     @Transactional(readOnly = true)

@@ -42,16 +42,19 @@ public class RoleService implements
         return roleOutputPort.findRoleByName(roleName);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Role> getAllRoles() {
         return roleOutputPort.getAllRoles();
     }
 
+    @Transactional
     @Override
     public void deleteRoleById(Long roleId) {
         roleOutputPort.deleteRoleById(roleId);
     }
 
+    @Transactional
     @Override
     public Role updateRole(Long roleId, Role roleToUpdate) {
         return roleOutputPort.updateRole(roleId, roleToUpdate);
